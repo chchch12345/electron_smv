@@ -634,8 +634,8 @@ function servercheck() {
 function openlink() {
     //const open = require('open');
     //const sendkeys = require('sendkeys-js')
-    var myInterval =  setInterval(function () {   
-        if(mac !== '000000000000'){
+    // var myInterval =  setInterval(function () {   
+    //     if(mac !== '000000000000'){
     var seturl = '';
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         if (err) throw err;
@@ -644,7 +644,7 @@ function openlink() {
         if (data != '') {
             jsondata = JSON.parse(data);
             if (jsondata.isSerdefault == '1') {
-                if (jsondata.serIP != '') { seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + mac }
+                if (jsondata.serIP != '') { seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden }
                 else { seturl = 'http://localhost/admin' }
             } else {
                 if (jsondata.serIPcus != '') { seturl = jsondata.serIPcus }
@@ -656,13 +656,13 @@ function openlink() {
         (async () => {//http://119.73.206.46:7890/Web/displaySignage.html#/init/b8aeed78f1cb
             // open(seturl);
             await mainWindow.loadURL(seturl)
-            clearInterval(myInterval);
+            //clearInterval(myInterval);
             // for win
             //if (seturl == 'http://localhost/admin') { } else { sendkeys.send('{f11}') }
         })();
         });
-     }
-    }, 10000);   
+    //  }
+    // }, 10000);   
 
 }
 
@@ -896,6 +896,25 @@ function lightoff() {
     });
 
 }
+function defaultConfigMacAddr(){
+
+    fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+        try {
+            var jdata = JSON.parse(data);
+            if(jdata.iden == '' && jdata.serIP == '' && jdata.serIPcus == '')
+            {
+            var intrWriteMac =  setInterval(function () {   
+                if(mac !== '000000000000'){
+                    jdata.iden = mac
+                    fs.writeFile(path.join(__dirname, 'config.xml'), JSON.stringify(jdata), function (err) {
+                        clearInterval(intrWriteMac);
+                    });
+                }
+            });
+            }
+        } catch (error) {errlog(error)}
+    });
+}
 
 process.on('uncaughtException', function (err) {
     console.log(err);
@@ -909,8 +928,8 @@ server.listen(80, function () {
     serverDellastYearSccLog();
     CheckserverSchedule();
     openlink();
+    defaultConfigMacAddr();
 });
-
 
 //W
 
