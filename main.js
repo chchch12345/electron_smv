@@ -625,6 +625,15 @@ function servercheck() {
                 })();
                 DisconTimeout10min = setTimeout(function () { restart(); }, 600000);
             }
+
+            if((isWifiDC == 0 || isLanDC == 0) && hdnisrestart == 1){
+                hdnisrestart = 0;
+                clearTimeout(DisconTimeout10min);
+                (async () => {
+                    await openlink();
+                })();  
+            }
+
         })
     }, 11000);
 
