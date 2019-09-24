@@ -972,9 +972,11 @@ setInterval(function () {
 	if(data && data.isSerdefault && diffMins > 5) {
 		// if(execSync("cat /var/www/config/auto_reboot").toString().trim() == "true" 
 			// && chrome) 
+		scclog('reboot :by frontend watchdog');	
 			
-			
-		child_process.exec('shutdown -r');
+		setTimeout(function(){
+			child_process.exec('shutdown -r');
+		}, 3000);
 	}
 }, 60000);
 
