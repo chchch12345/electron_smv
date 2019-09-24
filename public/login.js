@@ -174,6 +174,7 @@ function login() {
             console.log(data.res)
 
             if (data.res == true) {
+                cleartimer();
                 window.location.href = location + 'config'
             }
             else {
@@ -252,3 +253,13 @@ function getmonth() {
     document.getElementById("divmonth").innerHTML = n;
     document.getElementById("divday").innerHTML = dd;
 }
+
+function cleartimer() {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    fetch('/cleartimer', options)
+    }

@@ -15,6 +15,7 @@ var Datastore = require('nedb')
 const db = new Datastore({ filename: public+'/schedules.db', autoload: true });
 const log = require('error-log-file')
 var mac = '000000000000';
+var DisconTimeout10min;
 
 //W
 var app3 = express();
@@ -342,6 +343,10 @@ app2.post('/restart', (request, response) => {
     restart();
 })
 
+app2.post('/cleartimer', (request, response) => {
+    clearTimeout(DisconTimeout10min);
+})
+
 app2.post('/fetchdata', (request, response) => {
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         if (err) throw err;
@@ -618,7 +623,7 @@ function servercheck() {
                     //open('http://localhost/admin/');
                     await mainWindow.loadURL('http://localhost/admin/')
                 })();
-                setTimeout(function () { restart(); }, 600000);
+                DisconTimeout10min = setTimeout(function () { restart(); }, 600000);
             }
         })
     }, 11000);
