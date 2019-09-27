@@ -997,7 +997,7 @@ setInterval(function () {
 		// chrome = execSync('pgrep chrome').toString();
   	// } catch(ex) {}
 
-	if(data && data.isSerdefault && diffMins > 5) {
+	if(data && data.isSerdefault == '1' && diffMins > 5) {
 		// if(execSync("cat /var/www/config/auto_reboot").toString().trim() == "true" 
 			// && chrome) 
 		scclog('reboot :by frontend watchdog');	
