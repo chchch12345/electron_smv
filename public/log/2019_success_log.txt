@@ -41,3 +41,185 @@
 [2019-9-20 17:4:39] server.listen :Server has started successfully
 [2019-9-20 17:4:51] server.listen :Server has started successfully
 [2019-9-20 17:10:23] server.listen :Server has started successfully
+[2019-9-24 11:42:25] server.listen :Server has started successfully
+[2019-9-24 11:45:38] server.listen :Server has started successfully
+[2019-9-24 11:47:27] server.listen :Server has started successfully
+[2019-9-24 11:47:51] server.listen :Server has started successfully
+[2019-9-24 11:55:25] server.listen :Server has started successfully
+[2019-9-24 12:5:47] server.listen :Server has started successfully
+[2019-9-24 12:7:2] server.listen :Server has started successfully
+[2019-9-24 12:10:49] server.listen :Server has started successfully
+[2019-9-24 12:11:26] server.listen :Server has started successfully
+[2019-9-24 14:37:14] server.listen :Server has started successfully
+[2019-9-24 14:38:15] server.listen :Server has started successfully
+[2019-9-24 14:38:33] server.listen :Server has started successfully
+[2019-9-24 14:42:3] server.listen :Server has started successfully
+[2019-9-27 12:47:1] server.listen :Server has started successfully
+[2019-9-27 12:50:42] server.listen :Server has started successfully
+[2019-9-27 12:57:42] server.listen :Server has started successfully
+[2019-9-27 12:59:25] server.listen :Server has started successfully
+[2019-9-27 13:2:54] server.listen :Server has started successfully
+[2019-9-27 13:7:49] server.listen :Server has started successfully
+[2019-9-27 13:8:50] server.listen :Server has started successfully
+[2019-9-27 13:10:10] server.listen :Server has started successfully
+[2019-9-27 13:12:42] server.listen :Server has started successfully
+[2019-9-27 14:15:56] server.listen :Server has started successfully
+[2019-9-27 14:16:57] server.listen :Server has started successfully
+[2019-9-27 14:17:32] server.listen :Server has started successfully
+[2019-9-27 14:21:19] server.listen :Server has started successfully
+[2019-9-27 14:32:1] server.listen :Server has started successfully
+[2019-9-27 14:37:11] server.listen :Server has started successfully
+[2019-9-27 14:42:50] server.listen :Server has started successfully
+[2019-9-27 14:43:14] server.listen :Server has started successfully
+[2019-9-27 14:43:53] server.listen :Server has started successfully
+[2019-9-27 14:44:43] server.listen :Server has started successfully
+[2019-9-27 14:46:35] server.listen :Server has started successfully
+[2019-9-27 14:47:0] server.listen :Server has started successfully
+[2019-9-27 14:47:41] server.listen :Server has started successfully
+[2019-9-27 14:49:34] server.listen :Server has started successfully
+[2019-9-27 15:7:19] server.listen :Server has started successfully
+[2019-9-27 15:10:31] server.listen :Server has started successfully
+[2019-9-27 15:31:15] server.listen :Server has started successfully
+[2019-9-27 15:31:46] server.listen :Server has started successfully
+[2019-9-27 15:32:31] server.listen :Server has started successfully
+[2019-9-27 15:33:22] server.listen :Server has started successfully
+[2019-9-27 15:34:20] off() :Display off successfully
+[2019-9-27 15:41:8] server.listen :Server has started successfully
+[2019-9-27 15:41:27] off() :Display off successfully
+[2019-9-27 15:45:16] off() :Display off successfully
+[2019-9-27 16:2:7] server.listen :Server has started successfully
+[2019-9-27 16:10:39] server.listen :Server has started successfully
+[2019-9-27 16:12:14] server.listen :Server has started successfully
+[2019-9-27 16:12:33] off() :Display off successfully
+[2019-9-27 16:13:45] server.listen :Server has started successfully
+[2019-9-27 16:22:53] server.listen :Server has started successfully
+[2019-9-27 16:23:6] server.listen :Server has started successfully
+[2019-9-27 16:28:34] server.listen :Server has started successfully
+[2019-9-27 16:31:29] server.listen :Server has started successfully
+[2019-9-27 16:38:39] server.listen :Server has started successfully
+[2019-9-27 16:39:56] server.listen :Server has started successfully
+[2019-9-27 16:50:5] server.listen :Server has started successfully
+[2019-9-27 16:52:13] server.listen :Server has started successfully
+[2019-9-27 16:58:38] server.listen :Server has started successfully
+[2019-9-27 17:9:47] server.listen :Server has started successfully
+[2019-9-27 17:11:38] server.listen :Server has started successfully
+[2019-9-27 17:12:53] server.listen :Server has started successfully
+[2019-9-27 17:19:32] server.listen :Server has started successfully
+[2019-9-27 17:20:32] server.listen :Server has started successfully
+[2019-9-27 17:22:11] server.listen :Server has started successfully
+[2019-9-28 9:26:6] server.listen :Server has started successfully
+[2019-9-28 9:28:7] server.listen :Server has started successfully
+[2019-9-28 9:29:20] server.listen :Server has started successfully
+[2019-9-28 9:37:28] server.listen :Server has started successfully
+[2019-9-28 9:41:0] server.listen :Server has started successfully
+[2019-10-1 14:50:1] server.listen :Server has started successfully
+[2019-10-1 14:50:40] server.listen :Server has started successfully
+[2019-10-1 14:51:43] server.listen :Server has started successfully
+[2019-10-2 10:43:40] server.listen :Server has started successfully
+[2019-10-2 11:28:6] server.listen :Server has started successfully
+[2019-10-2 11:32:20] server.listen :Server has started successfully
+[2019-10-2 11:33:47] server.listen :Server has started successfully
+[2019-10-2 11:34:31] server.listen :Server has started successfully
+[2019-10-2 11:35:4] server.listen :Server has started successfully
+[2019-10-2 11:36:0] server.listen :Server has started successfully
+[2019-10-2 11:36:17] server.listen :Server has started successfully
+[2019-10-2 11:36:56] server.listen :Server has started successfully
+[2019-10-2 11:37:32] server.listen :Server has started successfully
+[2019-10-2 11:38:47] server.listen :Server has started successfully
+[2019-10-2 11:39:29] server.listen :Server has started successfully
+[2019-10-2 11:40:1] server.listen :Server has started successfully
+[2019-10-2 11:41:49] server.listen :Server has started successfully
+[2019-10-2 11:42:19] server.listen :Server has started successfully
+[2019-10-2 11:42:37] server.listen :Server has started successfully
+[2019-10-3 9:52:15] server.listen :Server has started successfully
+[2019-10-3 9:59:15] server.listen :Server has started successfully
+[2019-10-3 10:11:12] server.listen :Server has started successfully
+[2019-10-3 10:21:11] server.listen :Server has started successfully
+[2019-10-3 10:25:10] server.listen :Server has started successfully
+[2019-10-3 10:35:17] server.listen :Server has started successfully
+[2019-10-3 10:39:12] server.listen :Server has started successfully
+[2019-10-3 10:40:18] server.listen :Server has started successfully
+[2019-10-3 10:41:10] server.listen :Server has started successfully
+[2019-10-3 10:42:35] server.listen :Server has started successfully
+[2019-10-3 11:9:5] server.listen :Server has started successfully
+[2019-10-3 11:10:40] server.listen :Server has started successfully
+[2019-10-3 11:12:34] server.listen :Server has started successfully
+[2019-10-11 13:16:54] server.listen :Server has started successfully
+[2019-10-11 13:17:41] off() :Display off successfully
+[2019-10-11 13:17:55] off() :Display off successfully
+[2019-10-11 13:19:27] server.listen :Server has started successfully
+[2019-10-11 13:19:33] off() :Display off successfully
+[2019-10-11 13:20:37] off() :Display off successfully
+[2019-10-11 13:21:39] server.listen :Server has started successfully
+[2019-10-11 13:21:44] off() :Display off successfully
+[2019-10-11 13:21:54] off() :Display off successfully
+[2019-10-11 13:22:29] server.listen :Server has started successfully
+[2019-10-11 13:22:34] off() :Display off successfully
+[2019-10-11 13:22:42] off() :Display off successfully
+[2019-10-11 13:23:33] server.listen :Server has started successfully
+[2019-10-11 13:23:46] off() :Display off successfully
+[2019-10-11 13:23:55] off() :Display off successfully
+[2019-10-11 14:23:45] server.listen :Server has started successfully
+[2019-10-11 14:23:52] off() :Display off successfully
+[2019-10-11 14:25:35] server.listen :Server has started successfully
+[2019-10-11 14:25:42] off() :Display off successfully
+[2019-10-11 14:26:1] server.listen :Server has started successfully
+[2019-10-11 14:26:6] off() :Display off successfully
+[2019-10-11 14:26:14] off() :Display off successfully
+[2019-10-11 14:26:17] off() :Display off successfully
+[2019-10-11 14:28:56] server.listen :Server has started successfully
+[2019-10-11 14:29:3] lighton() :Display light on successfully
+[2019-10-11 14:29:10] lightoff() :Display light off successfully
+[2019-10-11 14:29:17] lighton() :Display light on successfully
+[2019-10-11 14:29:27] lighton() :Display light on successfully
+[2019-10-11 14:29:31] lightoff() :Display light off successfully
+[2019-10-11 14:29:41] lightoff() :Display light off successfully
+[2019-10-11 14:29:44] lightoff() :Display light off successfully
+[2019-10-11 14:29:49] lighton() :Display light on successfully
+[2019-10-11 14:30:0] lightoff() :Display light off successfully
+[2019-10-11 14:30:4] lighton() :Display light on successfully
+[2019-10-11 14:30:11] lightoff() :Display light off successfully
+[2019-10-11 14:32:24] server.listen :Server has started successfully
+[2019-10-11 14:32:34] lighton() :Display light on successfully
+[2019-10-11 14:32:45] lightoff() :Display light off successfully
+[2019-10-11 14:32:46] off() :Display off successfully
+[2019-10-11 14:34:28] server.listen :Server has started successfully
+[2019-10-11 14:34:40] lighton() :Display light on successfully
+[2019-10-11 14:34:57] lightoff() :Display light off successfully
+[2019-10-11 14:34:58] off() :Display off successfully
+[2019-10-11 14:35:7] lightoff() :Display light off successfully
+[2019-10-11 14:35:8] off() :Display off successfully
+[2019-10-11 14:35:17] lightoff() :Display light off successfully
+[2019-10-11 14:35:18] off() :Display off successfully
+[2019-10-11 14:35:27] lightoff() :Display light off successfully
+[2019-10-11 14:35:28] off() :Display off successfully
+[2019-10-11 14:35:37] lightoff() :Display light off successfully
+[2019-10-11 14:35:38] off() :Display off successfully
+[2019-10-11 14:35:47] lightoff() :Display light off successfully
+[2019-10-11 14:35:48] off() :Display off successfully
+[2019-10-11 14:35:57] lightoff() :Display light off successfully
+[2019-10-11 14:35:58] off() :Display off successfully
+[2019-10-11 14:36:7] lightoff() :Display light off successfully
+[2019-10-11 14:36:8] off() :Display off successfully
+[2019-10-11 14:36:17] lightoff() :Display light off successfully
+[2019-10-11 14:36:18] off() :Display off successfully
+[2019-10-11 14:37:3] server.listen :Server has started successfully
+[2019-10-11 14:38:18] server.listen :Server has started successfully
+[2019-10-11 14:38:28] lighton() :Display light on successfully
+[2019-10-11 14:38:42] lightoff() :Display light off successfully
+[2019-10-11 14:38:42] off() :Display off successfully
+[2019-10-11 14:38:51] lightoff() :Display light off successfully
+[2019-10-11 14:38:52] off() :Display off successfully
+[2019-10-11 14:39:2] lightoff() :Display light off successfully
+[2019-10-11 14:39:2] off() :Display off successfully
+[2019-10-11 17:6:0] server.listen :Server has started successfully
+[2019-10-11 17:10:59] server.listen :Server has started successfully
+[2019-10-11 17:12:5] server.listen :Server has started successfully
+[2019-10-11 17:19:39] server.listen :Server has started successfully
+[2019-10-11 17:19:59] CheckserverSchedule() :Valid time to sleep
+[2019-10-11 17:25:1] off() :Display off successfully
+[2019-10-11 17:25:11] off() :Display off successfully
+[2019-10-11 17:25:20] off() :Display off successfully
+[2019-10-11 17:29:50] off() :Display off successfully
+[2019-10-11 17:30:0] off() :Display off successfully
+[2019-10-11 17:30:10] off() :Display off successfully

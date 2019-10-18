@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 var express = require('express');
 var app2 = express();
@@ -12,10 +12,13 @@ var public = path.join(__dirname, 'public');
 var upload = require("express-fileupload");
 var Datastore = require('nedb')
 //'C:/SMV_venue_client/schedules.db'
-const db = new Datastore({ filename: public+'/schedules.db', autoload: true });
+const db = new Datastore({ filename: public + '/schedules.db', autoload: true });
 const log = require('error-log-file')
 var mac = '000000000000';
 var DisconTimeout10min;
+var server_off_time;
+var server_on_time;
+var intervalTimeSleep;
 
 //W
 var app3 = express();
@@ -31,30 +34,30 @@ if (handleSquirrelEvent(app)) {
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    },
-    fullscreen: true
-  })
-  mainWindow.setMenuBarVisibility(false)
-  // and load the index.html of the app.
-  //   mainWindow.loadFile('index.html')
-  mainWindow.loadURL('http://localhost/admin/')
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+function createWindow() {
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+        },
+        fullscreen: true
+    })
+    mainWindow.setMenuBarVisibility(false)
+    // and load the index.html of the app.
+    //   mainWindow.loadFile('index.html')
+    mainWindow.loadURL('http://localhost/admin/')
+    // Open the DevTools.
+    // mainWindow.webContents.openDevTools()
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mainWindow = null
+    })
 }
 
 // This method will be called when Electron has finished
@@ -64,15 +67,15 @@ app.on('ready', createWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') app.quit()
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow()
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) createWindow()
 })
 
 // In this file you can include the rest of your app's specific main process
@@ -90,19 +93,19 @@ function handleSquirrelEvent(application) {
     const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
     const exeName = path.basename(process.execPath);
 
-    const spawn = function(command, args) {
+    const spawn = function (command, args) {
         let spawnedProcess, error;
 
         try {
             spawnedProcess = ChildProcess.spawn(command, args, {
                 detached: true
             });
-        } catch (error) {}
+        } catch (error) { }
 
         return spawnedProcess;
     };
 
-    const spawnUpdate = function(args) {
+    const spawnUpdate = function (args) {
         return spawn(updateDotExe, args);
     };
 
@@ -158,15 +161,30 @@ app2.get('/admin/schedule', function (req, res) {
 });
 
 app2.get('/admin/screen_off.php', function (req, res) {
+var time = 1;
+
+var interval23 = setInterval(function() { 
+   if (time <= 3) { 
     off();
     lightoff();
-    res.send('off')
+    // console.log(time)
+      time++;
+   }
+   else { 
+      clearInterval(interval23);
+   }
+}, 10000);
+
+res.send('off')
+    // off();
+    // lightoff();
+    // res.send('off')
 })
 
 app2.get('/admin/reboot.php', function (req, res) {
     res.send('restart')
     restart();
-    
+
 })
 
 app2.get('/admin/lighton.php', function (req, res) {
@@ -197,7 +215,7 @@ app2.get('/admin/signage', function (req, res) {
 
 app2.get('/admin/download/success_log', function (req, res) {
     var date = new Date();
-    
+
     const file = public + `/log/` + date.getFullYear() + `_success_log.txt`
     // const file = `${public}/log/` + date.getFullYear() + `_success_log.txt`;
     res.download(file); // Set disposition and send it.
@@ -335,9 +353,9 @@ app2.post('/writefile', (request, response) => {
 
 })
 
-app2.post('/off', (request, response) => {
-    off();
-})
+// app2.post('/off', (request, response) => {
+//     off();
+// })
 
 app2.post('/restart', (request, response) => {
     restart();
@@ -489,37 +507,91 @@ app2.post('/autorestart', (request, response) => {
 
 app2.post('/getServerSchedule', (request, response) => {
     //mac = '000EC6DC5223'
-    const options = {
-        hostname: '119.73.206.46',
-        port: 7890,
-        path: '/Management/Device/Fetch?mac_address=' + mac,
-        method: 'GET'
-    }
-    const req = http.request(options, (res) => {
-
-        req.on('error', (error) => {
-            console.error(error)
-        })
-
-        res.on('data', (d) => {
-            try {
-                const jsondata = JSON.parse(d);
-                // console.log(jsondata.data.list[0].screen_off)
-                // console.log(jsondata.data.list[0].screen_on)
-                response.json({ on: jsondata.data.list[0].screen_on, off: jsondata.data.list[0].screen_off, mac: mac });
-                response.end();
-            } catch (e) {
-                errlog('getServerSchedule :' + e)
-                // console.log(e)
+    fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+        var readjsondata;
+        if (data != '') {
+            readjsondata = JSON.parse(data);
+            //console.log('readingschedule:' + readjsondata)
+            if(readjsondata.serIP != ''){
+                var hostN = readjsondata.serIP.split(':')[1].replace('//','')
+                var portN = readjsondata.serIP.split(':')[2]
+                // console.log(hostN)
+                // console.log(portN)
+            const options = {
+                hostname: hostN,
+                port: portN,
+                path: '/Management/Device/Fetch?mac_address=' + readjsondata.iden,
+                method: 'GET'
             }
-        })
-    })
+            const req = http.request(options, (res) => {
 
-    req.end()
+                req.on('error', (error) => {
+                    console.error(error)
+                })
+
+                res.on('data', (d) => {
+                    try {
+                        const jsondata = JSON.parse(d);
+
+                        //for ttsh only
+                        server_off_time = new Date(jsondata.data.list[0].screen_off);
+                        server_on_time = new Date(jsondata.data.list[0].screen_on);
+                        //for ttsh only
+
+                        //console.log(jsondata.data.list[0].screen_off)
+                        //console.log(jsondata.data.list[0].screen_on)
+                        response.json({ on: jsondata.data.list[0].screen_on, off: jsondata.data.list[0].screen_off, mac: mac });
+                        response.end();
+                    } catch (e) {
+                        errlog('getServerSchedule :' + e)
+                        // console.log(e)
+                    }
+                })
+            })
+
+            req.end()
+         }
+        }
+    });
+    //for ttsh only 
+    setTimeout(function () {
+        var dtcurrent = new Date()
+        var valid = (dtcurrent > server_off_time)
+        var valid1 = (dtcurrent < server_on_time);
+        // console.log(valid, valid1)
+        if (valid && valid1) { 
+            // console.log('valid')
+            scclog('call /getServerSchedule :Valid time to sleep')
+            isTimeToSleep() }else{
+                try {clearInterval(intervalTimeSleep);} catch (e) {}
+            }
+    }, 20000);
+    //for ttsh only
 })
 
 function off() {
-    scclog('off() :Display off successfully')
+    // scclog('off() :Display off successfully')
+    //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
+    var spawn = require('child_process').spawn,
+        ls = spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
+
+    ls.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+
+    ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+
+    ls.on('exit', function (code) {
+        console.log('child process exited with code ' + code);
+        if(code === 0){scclog('off() :Display off successfully')}
+    });
+
+}
+
+function offxlog() {
+    // scclog('off() :Display off successfully')
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
         ls = spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
@@ -572,7 +644,7 @@ function on() {
 }
 
 function restart() {
-    scclog('restart() :Reboot successfully')
+    // scclog('restart() :Reboot successfully')
     var spawn = require('child_process').spawn,
         ls = spawn('cmd.exe', ['/C', "shutdown /r /f /t 0"]);
 
@@ -586,57 +658,77 @@ function restart() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
+        if(code === 0){scclog('restart() :restart successfully')}
     });
 }
 
 function servercheck() {
 
-    //   var cnt =0;
+    //light on
+    var time2 = 1;
+
+    var interval24 = setInterval(function() { 
+       if (time2 <= 3) { 
+        lighton();
+          time2++;
+       }
+       else { 
+          clearInterval(interval24);
+       }
+    }, 10000);
+    //light on
+
     var hdnisrestart = 0;
     var intervalNetwork = setInterval(function () {
         var network = require('network');
         network.get_interfaces_list(function (err, list) {
-            //console.log(list)
+            //  console.log(list)
             // console.log(cnt++)
             var isWifiDC = 0;
             var isLanDC = 0;
+            var gotLAN = 0;
+            var gotWIFI = 0;
             Object.keys(list).forEach(function (key) {
                 if (list[key].name == 'Wi-Fi') {
                     if (list[key].ip_address == null) { isWifiDC = 1 };
                 }
+                
                 if (list[key].name.startsWith('Ethe')) {
                     if (list[key].ip_address == null) { isLanDC = 1 };
-
-                    mac = list[key].mac_address.replace(/:/gi,'')
-
+                    mac = list[key].mac_address.replace(/:/gi, '')
                 }
+                if (list[key].name.startsWith('Ethe')) { gotLAN = 1 }
+                if (list[key].name.startsWith('Wi-Fi')) { gotWIFI = 1 }
             })
+            if(gotLAN == 0){ isLanDC = 1}
+            if(gotWIFI == 0){ isWifiDC = 1}
+            // console.log('gotLAN :' + gotLAN)
             // console.log('isLanDC :' + isLanDC)
+            // console.log('gotWIFI :' + gotWIFI)
             // console.log('isWifiDC :' + isWifiDC)
-            // console.log('hdnisrestart.value :' + hdnisrestart)
+            // console.log('hdnisrestart.value :' + hdnisrestart)          
             if (isWifiDC == 1 && isLanDC == 1 && hdnisrestart == 0) {
-                // console.log('autorestart')
+                // console.log('timerstart')
+                scclog('servercheck : restart timerstart status: ' + 'GL:'+ gotLAN + ',LID:'+ isLanDC+ ',GW:'+ gotWIFI+ ',WID:'+ isWifiDC)
                 hdnisrestart = 1;
-                //const open = require('open');
-                (async () => {
-                    // Opens the url in the default browser
-                    //open('http://localhost/admin/');
-                    await mainWindow.loadURL('http://localhost/admin/')
-                })();
-                DisconTimeout10min = setTimeout(function () { restart(); }, 600000);
+                (async () => { await mainWindow.loadURL('http://localhost/admin/')})();
+                DisconTimeout10min = setTimeout(function () { 
+                    scclog('servercheck : restarting. reason no internet')
+                    setTimeout(function () { restart(); }, 10000);
+                    }, 600000);
             }
-
-            if((isWifiDC == 0 || isLanDC == 0) && hdnisrestart == 1){
+            
+            if ((isWifiDC == 0 || isLanDC == 0) && hdnisrestart == 1) {
+                // console.log('timerstop')
+                scclog('servercheck : restart timerstop status: ' + 'GL:'+ gotLAN + ',LID:'+ isLanDC+ ',GW:'+ gotWIFI+ ',WID:'+ isWifiDC)
                 hdnisrestart = 0;
                 clearTimeout(DisconTimeout10min);
                 (async () => {
                     await openlink();
-                })();  
+                })();
             }
-
         })
     }, 11000);
-
 
 }
 
@@ -648,7 +740,7 @@ function openlink() {
     var seturl = '';
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         if (err) throw err;
-        //console.log(JSON.parse(data))jsondata.serIP + '/Web/displaySignage.html#/view/' + mac
+        //jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden 
         var jsondata;
         if (data != '') {
             jsondata = JSON.parse(data);
@@ -669,7 +761,7 @@ function openlink() {
             // for win
             //if (seturl == 'http://localhost/admin') { } else { sendkeys.send('{f11}') }
         })();
-        });
+    });
     //  }
     // }, 10000);   
 
@@ -685,7 +777,19 @@ function setcron(cat, Hcron, Mcron, Daycron) {
     if (cat == 'dsr') {
         console.log('display off schedule')
         cron.schedule(setcronstr, () => {
-            off();
+            scclog('server_start_cron() :from local cron')
+            var time = 1;
+            var interval99 = setInterval(function() { 
+                if (time <= 3) { 
+                 off();
+                 lightoff();
+                 // console.log(time)
+                   time++;
+                }
+                else { 
+                   clearInterval(interval99);
+                }
+             }, 10000);
         })
     }
     if (cat == 'dss') {
@@ -706,7 +810,19 @@ function setCustomcron(cat, Daycron) {
     if (cat == 'csr') {
         console.log('custom display off schedule')
         schedule.scheduleJob(date, function () {
-            off();
+            scclog('server_start_cron() :from local cron')
+            var time = 1;
+            var interval99 = setInterval(function() { 
+                if (time <= 3) { 
+                 off();
+                 lightoff();
+                 // console.log(time)
+                   time++;
+                }
+                else { 
+                   clearInterval(interval99);
+                }
+             }, 10000);
         });
     }
     if (cat == 'css') {
@@ -737,7 +853,19 @@ function server_start_cron() {
                         var valid = cron.validate(setcronstr);
                         console.log('valid set : ' + docs[key]._id)
                         cron.schedule(setcronstr, () => {
-                            off();
+                            scclog('server_start_cron() :from local cron')
+                            var time = 1;
+                            var interval99 = setInterval(function() { 
+                                if (time <= 3) { 
+                                 off();
+                                 lightoff();
+                                 // console.log(time)
+                                   time++;
+                                }
+                                else { 
+                                   clearInterval(interval99);
+                                }
+                             }, 10000);
                         })
                     });
                 });
@@ -761,7 +889,19 @@ function server_start_cron() {
                         var date = new Date(docs[key].Daycron);
                         console.log('valid set cust :' + date)
                         schedule.scheduleJob(date, function () {
-                            off();
+                            scclog('server_start_cron() :from local cron')
+                            var time = 1;
+                            var interval99 = setInterval(function() { 
+                                if (time <= 3) { 
+                                 off();
+                                 lightoff();
+                                 // console.log(time)
+                                   time++;
+                                }
+                                else { 
+                                   clearInterval(interval99);
+                                }
+                             }, 10000);
                         });
                     });
                 });
@@ -801,39 +941,59 @@ function CheckserverSchedule() {
     // var intervalServerSchedule = setInterval(function () {
     //mac = '000EC6DC5223'
     setTimeout(function () {
-        console.log(mac)
-        const options = {
-            hostname: '119.73.206.46',
-            port: 7890,
-            path: '/Management/Device/Fetch?mac_address=' + mac,
-            method: 'GET'
-        }
-        const req = http.request(options, (res) => {
-
-            req.on('error', (error) => {
-                console.error(error)
-            })
-
-            res.on('data', (d) => {
-                try {
-                    const jsondata = JSON.parse(d);
-                    // console.log(jsondata.data.list[0].screen_off)
-                    // console.log(jsondata.data.list[0].screen_on)
-                    var dtcurrent = new Date()
-                    var dtoff = new Date(jsondata.data.list[0].screen_off);
-                    var dton = new Date(jsondata.data.list[0].screen_on);
-                    var valid = (dtcurrent > dtoff)
-                    var valid1 = (dtcurrent < dton);
-                    if (valid && valid1) { off() }
-                } catch (e) {
-                    errlog('CheckserverSchedule :' + e)
-                    // console.log(e)
-                }
-            })
-        })
-
-        req.end()
-    }, 30000);
+        fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+            var readjsondata;
+            if (data != '') {
+                readjsondata = JSON.parse(data);
+                // console.log(mac)
+                if(readjsondata.serIP != ''){
+                    var hostN = readjsondata.serIP.split(':')[1].replace('//','')
+                    var portN = readjsondata.serIP.split(':')[2]
+                    // console.log(hostN)
+                    // console.log(portN)
+                    const options = {
+                        hostname: hostN,
+                        port: portN,
+                        path: '/Management/Device/Fetch?mac_address=' + readjsondata.iden,
+                        method: 'GET'
+                    }
+                    const req = http.request(options, (res) => {
+    
+                        req.on('error', (error) => {
+                            console.error(error)
+                        })
+    
+                        res.on('data', (d) => {
+                            try {
+                                const jsondata = JSON.parse(d);
+                                console.log(jsondata.data.list[0].screen_off)
+                                console.log(jsondata.data.list[0].screen_on)
+                                var dtcurrent = new Date()
+                                // var dtoff = new Date(jsondata.data.list[0].screen_off);
+                                // var dton = new Date(jsondata.data.list[0].screen_on);
+                                server_off_time = new Date(jsondata.data.list[0].screen_off);
+                                server_on_time = new Date(jsondata.data.list[0].screen_on);
+                                var valid = (dtcurrent > server_off_time)
+                                var valid1 = (dtcurrent < server_on_time);
+                                console.log(valid, valid1)
+                                if (valid && valid1) { 
+                                    console.log('valid')
+                                    scclog('CheckserverSchedule() :Valid time to sleep')
+                                    isTimeToSleep() }else{
+                                        try {clearInterval(intervalTimeSleep);} catch (e) {}
+                                    }
+                            } catch (e) {
+                                errlog('CheckserverSchedule :' + e)
+                                // console.log(e)
+                            }
+                        })
+                    })
+    
+                    req.end()
+                } 
+            }
+        });
+    }, 20000);
     // }, 12000);
 }
 
@@ -851,7 +1011,7 @@ function serverDellastYearSccLog() {
     });
 
     var fileE = date.getFullYear() + '_error_log.txt'
-    var pathE =  public + '/log/' +fileE
+    var pathE = public + '/log/' + fileE
 
     fs.access(pathE, fs.F_OK, (err) => {
         if (err) {
@@ -867,10 +1027,10 @@ function serverDellastYearSccLog() {
 }
 
 function lighton() {
-    scclog('off() :Display off successfully')
+
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
-        ls = spawn('cmd.exe', ['/C', "powershell -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightON.ps1"]);
+    ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT open 01"]);
 
     ls.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -882,15 +1042,37 @@ function lighton() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
+        if(code === 0){scclog('lighton() :Display light on successfully')}
     });
 
 }
 
 function lightoff() {
-    scclog('off() :Display off successfully')
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
-        ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
+    // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
+        ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
+
+    ls.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+
+    ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+
+    ls.on('exit', function (code) {
+        console.log('child process exited with code ' + code);
+        if(code === 0){scclog('lightoff() :Display light off successfully')}
+    });
+
+}
+
+function lightoffxlog() {
+    //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
+    var spawn = require('child_process').spawn,
+    // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
+        ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
 
     ls.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -905,30 +1087,54 @@ function lightoff() {
     });
 
 }
-function defaultConfigMacAddr(){
+function defaultConfigMacAddr() {
 
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         try {
             var jdata = JSON.parse(data);
-            if(jdata.iden == '' && jdata.serIP == '' && jdata.serIPcus == '')
-            {
-            var intrWriteMac =  setInterval(function () {   
-                if(mac !== '000000000000'){
-                    jdata.iden = mac
-                    fs.writeFile(path.join(__dirname, 'config.xml'), JSON.stringify(jdata), function (err) {
-                        clearInterval(intrWriteMac);
-                    });
-                }
-            });
+            if (jdata.iden == '' && jdata.serIP == '' && jdata.serIPcus == '') {
+                var intrWriteMac = setInterval(function () {
+                    if (mac !== '000000000000') {
+                        jdata.iden = mac
+                        fs.writeFile(path.join(__dirname, 'config.xml'), JSON.stringify(jdata), function (err) {
+                            clearInterval(intrWriteMac);
+                        });
+                    }
+                });
             }
-        } catch (error) {errlog(error)}
+        } catch (error) { errlog(error) }
     });
+}
+
+function isTimeToSleep() {
+    intervalTimeSleep = setInterval(function() { 
+        var time = 1;
+        var intervalsleep = setInterval(function() { 
+            if (time <= 3) { 
+             offxlog();
+             lightoffxlog();
+               time++;
+            }
+            else { 
+               clearInterval(intervalsleep);
+            }
+         }, 10000);
+
+        var dtcurrent = new Date()
+        var valid = (dtcurrent >= server_on_time)
+        if(valid){
+            scclog('isTimeToSleep() interval :local time > server_on_time run restart from local')
+            restart();
+            // try {clearInterval(intervalTimeSleep);} catch (e) {}
+        }
+         
+     }, 290000);
 }
 
 process.on('uncaughtException', function (err) {
     console.log(err);
     errlog(err)
-}); 
+});
 
 server.listen(80, function () {
     scclog('server.listen :Server has started successfully')
@@ -940,72 +1146,84 @@ server.listen(80, function () {
     defaultConfigMacAddr();
 });
 
+
 //W
 
 var last_update = new Date();
 
 app3.all('/heartbeat', function (req, res) {
-	if(mac) {
-		const options = {
-			hostname: '119.73.206.46',
-			port: 7890,
-			path: '/InterfaceAPI/STB/Heartbeat?mac_address=' + mac,
-			method: 'GET'
-		}
-		
-		const req = http.get(options, (res) => {
 
-			res.on('data', (d) => {
-				try {
-					console.log(JSON.parse(d));
-					
-					last_update = new Date();
-					console.log("Last update", last_update);
-					
-					response.end();
-				} catch (e) {
-					// console.log(e)
-				}
-			})
-		})
-		
-		req.on('error', (error) => {
-				//console.error(error)
-			})
-		
-		req.end();
-	}
-	
-	res.json({"result": "ok"});
+fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+    var readjsondata;
+    if (data != '') {
+        readjsondata = JSON.parse(data);
+        
+        if(readjsondata.serIP != ''){
+            var hostN = readjsondata.serIP.split(':')[1].replace('//','')
+            var portN = readjsondata.serIP.split(':')[2]
+ 
+        const options = {
+            hostname: hostN,
+            port: portN,
+            path: '/InterfaceAPI/STB/Heartbeat?mac_address='  + readjsondata.iden,
+            method: 'GET'
+        }
+
+        const req = http.get(options, (res) => {
+
+            res.on('data', (d) => {
+                try {
+                    console.log(JSON.parse(d));
+
+                    last_update = new Date();
+                    console.log("Last update", last_update);
+
+                    response.end();
+                } catch (e) {
+                    // console.log(e)
+                }
+            })
+        })
+
+        req.on('error', (error) => {
+            //console.error(error)
+        })
+
+        req.end();
+        }
+      }
+    });
+    res.json({ "result": "ok" });
+    
 });
 
 setInterval(function () {
     var child_process = require('child_process');
-	var now = new Date();
-	var diffMs = now - last_update;
-	var diffMins = ((diffMs % 86400000) % 3600000) / 60000; // minutes
-	
-	var data = fs.readFileSync(path.join(__dirname, 'config.xml'));
-	
-	try {
-		data = JSON.parse(data);
-	} catch (e) {}
-	//console.log("mins", diffMins);
+    var now = new Date();
+    var diffMs = now - last_update;
+    var diffMins = ((diffMs % 86400000) % 3600000) / 60000; // minutes
 
-	// var chrome = null;
-	// try {
-		// chrome = execSync('pgrep chrome').toString();
-  	// } catch(ex) {}
+    var data = fs.readFileSync(path.join(__dirname, 'config.xml'));
 
-	if(data && data.isSerdefault == '1' && diffMins > 5) {
-		// if(execSync("cat /var/www/config/auto_reboot").toString().trim() == "true" 
-			// && chrome) 
-		scclog('reboot :by frontend watchdog');	
-			
-		setTimeout(function(){
-			child_process.exec('shutdown -r');
-		}, 3000);
-	}
+    try {
+        data = JSON.parse(data);
+    } catch (e) { }
+    //console.log("mins", diffMins);
+
+    // var chrome = null;
+    // try {
+    // chrome = execSync('pgrep chrome').toString();
+    // } catch(ex) {}
+
+    if (data && data.isSerdefault == '1' && diffMins > 5) {
+        // if(execSync("cat /var/www/config/auto_reboot").toString().trim() == "true" 
+        // && chrome) 
+        scclog('reboot :by frontend watchdog');
+
+        setTimeout(function () {
+            child_process.exec('shutdown -r');
+        }, 3000);
+    }
 }, 60000);
 
 

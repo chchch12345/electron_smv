@@ -26,10 +26,10 @@
     <div id="ContentPage">
         <div class="content">
             <div style="margin: auto;" class="row">
-                <div  style="width: 15%;" class="columnContent">
+                <div style="width: 15%;" class="columnContent">
                     <label class="configlabel">Server IP</label>
                 </div>
-                <div  style="width: 10%;" class="columnContent">
+                <div style="width: 10%;" class="columnContent">
                     <select id="ddlprotocoldef" style="width: auto;cursor: pointer; margin-left: 8%;">
                         <option value="nots">http://</option>
                         <option value="gots">https://</option>
@@ -45,10 +45,10 @@
             </div>
 
             <div id='customIPdiv' style="margin: auto;" class="row">
-                <div  style="width: 15%;" class="columnContent">
+                <div style="width: 15%;" class="columnContent">
                     <label class="configlabel">Custom IP</label>
                 </div>
-                <div  style="width: 10%;" class="columnContent">
+                <div style="width: 10%;" class="columnContent">
                     <select id="ddlprotocolcus" style="width: auto;cursor: pointer; margin-left: 8%;">
                         <option value="nots">http://</option>
                         <option value="gots">https://</option>
@@ -68,7 +68,7 @@
                         <input style="width:100%" type="text" id='txtiden' />
                     </div>
                     <div style="width: 25%; float:left;padding-left: 2%;">
-                        <button onclick='return reset()'>RESET</button>
+                        <button id='btnreset' onclick='return reset()'>RESET</button>
                     </div>
                 </div>
 
@@ -85,7 +85,7 @@
                         <label style="margin-top: 2%;" for="rdbcustom">Custom</label>
                         <!-- <input style="width:100%"  class="my_input_style" id='txtiden' /> -->
                     </div>
-                    
+
                     <!-- <div style="width:10%;" class="columnContent">
                         <label class="configlabel">Protocol</label>
                     </div>
@@ -120,7 +120,7 @@
                             <div></div>
                             <div></div>
                             <div></div>
-                        </div>  
+                        </div>
 
                         <div style="margin: auto;" class="row">
                             <div class="column">
@@ -170,11 +170,10 @@
                     <label class="configtitle">
                         OTHERS</label>
                     <!-- <button onclick='return FooSet()'>Set URL</button> -->
+                    <!-- confirm_off("(Display Off) Are you sure?") confirm_restart("(Restart) Are you sure?")-->
                     <div style="margin-top:10px;">
-                        <button style="margin-left: 7%;"
-                            onclick='return confirm_off("(Display Off) Are you sure?")'>Display Off</button>
-                        <button style="margin-left: 1%;"
-                            onclick='return confirm_restart("(Restart) Are you sure?")'>Restart</button>
+                        <button style="margin-left: 7%;" onclick='ConfirmPopOFF()'>Display Off</button>
+                        <button style="margin-left: 1%;" onclick='ConfirmPopRES()'>Restart</button>
                     </div>
                 </div>
 
@@ -201,10 +200,8 @@
                      onclick="location.href='http://localhost/admin/download/error_log'"
                     -->
                     <div style="margin-top:10px;">
-                        <button id='btnsslog' style="margin-left: 7%;"
-                           >Success</button>
-                        <button id='btneelog' style="margin-left: 1%;"
-                           >Error</button>
+                        <button id='btnsslog' style="margin-left: 7%;">Success</button>
+                        <button id='btneelog' style="margin-left: 1%;">Error</button>
                     </div>
                 </div>
             </div>
@@ -217,5 +214,40 @@
     <input hidden="true" id="hdnisrestart" value="0" />
 
 </body>
+
+<!-- pop out -->
+<div id='popmsg' style="display:none;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:80%;" class="column">
+            <div style="font-weight: bold;font-family: sans-serif;" id='popmsgcontent'></div>
+        </div>
+        <div style="width:20%;margin-top:1%" class="column"><span
+                onclick="this.parentElement.parentElement.parentElement.style.display='none';"
+                class="closebtn">&times;</span></div>
+    </div>
+</div>
+<div id='popmsgqueryoff' style="display:none;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:100%;" class="column">
+            <div style="font-weight: bold;font-family: sans-serif;">(Display Off) Are you sure?</div>
+        </div>
+        <button style="border: 1px solid grey; float: right;" onclick="confirm_off(this)">OK</button>
+        <button style="border: 1px solid grey;margin-right: 10;float: right;"
+            onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
+        <!-- <div style="width:20%;margin-top:1%" class="column"><span onclick="this.parentElement.parentElement.parentElement.style.display='none';" class="closebtn">&times;</span></div> -->
+    </div>
+</div>
+<div id='popmsgqueryrestart' style="display:none;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:100%;" class="column">
+            <div style="font-weight: bold;font-family: sans-serif;">(Restart) Are you sure?</div>
+        </div>
+        <button style="border: 1px solid grey; float: right;" onclick="confirm_restart(this)">OK</button>
+        <button style="border: 1px solid grey;margin-right: 10;float: right;"
+            onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
+        <!-- <div style="width:20%;margin-top:1%" class="column"><span onclick="this.parentElement.parentElement.parentElement.style.display='none';" class="closebtn">&times;</span></div> -->
+    </div>
+</div>
+<!-- pop out -->
 
 </html>

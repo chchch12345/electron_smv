@@ -109,7 +109,11 @@ function Adddsr() {
     if (processObjValid(dsrbtn)) {
         FooSet('dsr' + Math.random() * 100000, 'dsr', processObj(dsrbtn, dsrtxttime.value), h, m, processObjCronDay(dsrbtn))
     } else {
-        alert('Please select atleast a week.')
+        if (document.getElementById("popmsgcontent").innerHTML != "Please select atleast a week.") { document.getElementById("popmsgcontent").innerHTML = "Please select atleast a week."; }
+        document.getElementById("popmsg").className = "alertErr";
+        document.getElementById("popmsg").style.display = "block";
+        setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+        //alert('Please select atleast a week.')
     }
 
 }
@@ -197,7 +201,11 @@ function FooSet(ID, CAT, DT, H, M, listDay) {
             console.log('writefilemsg : ' + data.msg)
             if (data.msg == 1) {
                 FooRead(CAT);
-                alert("The schedule was saved!")
+                document.getElementById("popmsgcontent").innerHTML = "ADD SUCCESSFUL !";
+                document.getElementById("popmsg").className = "alertScc";
+                document.getElementById("popmsg").style.display = "block";
+                setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+                //alert("The schedule was saved!")
             } else { alert("error!") }
         })
 
@@ -328,7 +336,11 @@ function Adddss() {
     if (processObjValid(dssbtn)) {
         FooSet('dss' + Math.random() * 100000, 'dss', processObj(dssbtn, dsstxttime.value), h, m, processObjCronDay(dssbtn))
     } else {
-        alert('Please select atleast a week.')
+        if (document.getElementById("popmsgcontent").innerHTML != "Please select atleast a week.") { document.getElementById("popmsgcontent").innerHTML = "Please select atleast a week."; }
+        document.getElementById("popmsg").className = "alertErr";
+        document.getElementById("popmsg").style.display = "block";
+        setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+        //alert('Please select atleast a week.')
     }
 }
 
@@ -358,11 +370,19 @@ function Addcsr() {
             var forcron = new Date(y, mm - 1, d, h, m, 0);
             FooSet('csr' + Math.random() * 100000, 'csr', display, h, m, forcron)
         } else {
-            alert('Please select a valid date and time.')
+            if (document.getElementById("popmsgcontent").innerHTML != "Please select a valid date and time.") { document.getElementById("popmsgcontent").innerHTML = "Please select a valid date and time."; }
+            document.getElementById("popmsg").className = "alertErr";
+            document.getElementById("popmsg").style.display = "block";
+            setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+            //alert('Please select a valid date and time.')
         }
     }
     catch (err) {
-        alert('Please select a valid date and time.')
+        if (document.getElementById("popmsgcontent").innerHTML != "Please select a valid date and time.") { document.getElementById("popmsgcontent").innerHTML = "Please select a valid date and time."; }
+        document.getElementById("popmsg").className = "alertErr";
+        document.getElementById("popmsg").style.display = "block";
+        setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+        // alert('Please select a valid date and time.')
     }
 
 
@@ -389,11 +409,19 @@ function Addcss() {
             var forcron = new Date(y, mm - 1, d, h, m, 0);
             FooSet('css' + Math.random() * 100000, 'css', display, h, m, forcron)
         } else {
-            alert('Please select a valid date and time.')
+            if (document.getElementById("popmsgcontent").innerHTML != "Please select a valid date and time.") { document.getElementById("popmsgcontent").innerHTML = "Please select a valid date and time."; }
+            document.getElementById("popmsg").className = "alertErr";
+            document.getElementById("popmsg").style.display = "block";
+            setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+            // alert('Please select a valid date and time.')
         }
     }
     catch (err) {
-        alert('Please select a valid date and time.')
+        if (document.getElementById("popmsgcontent").innerHTML != "Please select a valid date and time.") { document.getElementById("popmsgcontent").innerHTML = "Please select a valid date and time."; }
+        document.getElementById("popmsg").className = "alertErr";
+        document.getElementById("popmsg").style.display = "block";
+        setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+        // alert('Please select a valid date and time.')
     }
 
 

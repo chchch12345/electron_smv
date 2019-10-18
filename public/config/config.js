@@ -1,32 +1,36 @@
-function confirm_restart(question) {
+function confirm_restart(el) {
 
-    if (confirm(question)) {
+    el.parentNode.parentNode.style.display = 'none';
+    // if (confirm(question)) {
 
-        fooRestart();
-        // alert("Processing...");
+    fooRestart();
+    // alert("Processing...");
+    // console.log('restart')
 
-    } else {
-        return false;
-    }
+    // } else {
+    //     return false;
+    // }
 
 }
 
-function confirm_off(question) {
-    if (confirm(question)) {
+function confirm_off(el) {
+    // if (confirm(question)) {
 
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-        fetch('/off', options);
+    el.parentNode.parentNode.style.display = 'none';
 
-        return true;
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    fetch('/off', options);
 
-    } else {
-        return false;
-    }
+    return true;
+
+    // } else {
+    //     return false;
+    // }
 }
 
 function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag) {
@@ -51,8 +55,18 @@ function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag) {
         .then(function (data) {
             console.log('writefilemsg : ' + data.msg)
             if (data.msg == 1) {
-                alert("The file was saved!")
-            } else { alert("error!") }
+                if (document.getElementById("popmsgcontent").innerHTML != "SAVE SUCCESSFUL !") { document.getElementById("popmsgcontent").innerHTML = "SAVE SUCCESSFUL !"; }
+                document.getElementById("popmsg").className = "alertScc";
+                document.getElementById("popmsg").style.display = "block";
+                setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+                //alert("The file was saved!")
+            } else {
+                if (document.getElementById("popmsgcontent").innerHTML != "error!") { document.getElementById("popmsgcontent").innerHTML = "error!"; }
+                document.getElementById("popmsg").className = "alertErr";
+                document.getElementById("popmsg").style.display = "block";
+                setTimeout(function () { document.getElementById("popmsg").style.display = "none"; }, 3000);
+                // alert("error!")
+            }
         })
 
 
@@ -76,6 +90,7 @@ function Setdefault() {
     //document.body.className = 'freeze'
     document.getElementById("loadings").style.display = "block";
     document.getElementById("loadingsMSG").style.display = "block";
+    document.getElementById("btnreset").className = 'freeze';
     document.getElementById("btnsslog").className = 'freeze';
     document.getElementById("btneelog").className = 'freeze';
 
@@ -174,12 +189,11 @@ function Setdefault() {
                     if (data[key].ip_address == null) { document.getElementById('lblcontwifistatus').style.color = "red" }
                     else { document.getElementById('lblcontwifistatus').style.color = "green" }
 
-                    if(data[key].ip_address != null)
-                    {
-                        document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://"+data[key].ip_address+"/admin/download/success_log'")
-                        document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://"+data[key].ip_address+"/admin/download/error_log'")
+                    if (data[key].ip_address != null) {
+                        document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/success_log'")
+                        document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/error_log'")
                     }
-                 }
+                }
                 if (data[key].name.startsWith('Ethe')) {
                     //cont
                     document.getElementById('lblcontethmac').innerHTML = data[key].mac_address;
@@ -192,13 +206,13 @@ function Setdefault() {
                     //document.body.className = '';
                     document.getElementById("loadings").style.display = "none";
                     document.getElementById("loadingsMSG").style.display = "none";
-                    
+
+                    document.getElementById("btnreset").className = '';
                     document.getElementById("btnsslog").className = '';
                     document.getElementById("btneelog").className = '';
-                    if(data[key].ip_address != null)
-                    {
-                        document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://"+data[key].ip_address+"/admin/download/success_log'")
-                        document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://"+data[key].ip_address+"/admin/download/error_log'")
+                    if (data[key].ip_address != null) {
+                        document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/success_log'")
+                        document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/error_log'")
                     }
                 }
 
@@ -259,7 +273,7 @@ function serConSave() {
 }
 
 function reset() {
-    txtiden.value = document.getElementById('lblcontethmac').innerHTML;
+    txtiden.value = document.getElementById('lblcontethmac').innerHTML.replace(/:/gi, '');
 }
 
 function handleClick(drone) {
@@ -270,13 +284,13 @@ function handleClick(drone) {
         // document.getElementById("txtserurl").style.display = "block";
 
         document.getElementById("customIPdiv").style.display = "none";
-        
+
     }
     else {
         document.getElementById("ddlprotocolcus").value = hdnCIP.value;
         // document.getElementById("txtserurl").style.display = "none";
         // document.getElementById("txtserurlcustom").style.display = "block"
-        
+
         document.getElementById("customIPdiv").style.display = "block";;
     }
 }
@@ -296,6 +310,15 @@ function Goshc() {
     return true;
 }
 
+function ConfirmPopOFF() {
+    document.getElementById("popmsgqueryoff").className = "alertConfirm";
+    document.getElementById("popmsgqueryoff").style.display = "block";
+}
+
+function ConfirmPopRES() {
+    document.getElementById("popmsgqueryrestart").className = "alertConfirm";
+    document.getElementById("popmsgqueryrestart").style.display = "block";
+}
 
 
 
