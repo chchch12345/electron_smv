@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron')
+const electron = require('electron')
 const path = require('path')
 var express = require('express');
 var app2 = express();
@@ -19,6 +20,7 @@ var DisconTimeout10min;
 var server_off_time;
 var server_on_time;
 var intervalTimeSleep;
+const dbExt = new Datastore({ filename: public + '/ExtendMonitor.db', autoload: true });
 
 //W
 var app3 = express();
@@ -64,6 +66,59 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
+// app.on('ready', createWindow2)
+
+//Extend Monitor uncomment below
+app.on('ready', () => {
+    let displays = electron.screen.getAllDisplays()
+    let externalDisplay = [];
+    // let picurl = [];
+
+    // picurl = ['http://hdwpro.com/wp-content/uploads/2016/03/Fantastic-Full-HD-Wallpaper.jpg',
+    //     'http://hdwpro.com/wp-content/uploads/2017/01/Widescreen-Best-HD-Wallpaper.jpg',
+    //     'http://hdwpro.com/wp-content/uploads/2017/01/Car-Full-HD-Wallpaper.jpg',
+    //     'http://hdwpro.com/wp-content/uploads/2017/01/Awesome-Best-HD-Wallpaper.png',
+    //     'http://hdwpro.com/wp-content/uploads/2017/01/Stunning-Full-HD-Wallpaper.jpg',
+    //     'http://localhost/admin/']
+
+    Object.keys(displays).forEach(function (key) {
+        Object.keys(displays[key]).forEach(function (key2) {
+            if (key2 == 'bounds') {
+                if (displays[key][key2].x !== 0 || displays[key][key2].y !== 0) {
+                    externalDisplay.push(displays[key][key2]);
+                } else { }
+            }
+        });
+    });
+    //console.log(externalDisplay.length)
+    dbExt.find({}, function (err, docs) {
+         for (var i in externalDisplay) {
+
+            let createWindowmulti = new BrowserWindow({
+                x: externalDisplay[i].x,
+                y: externalDisplay[i].y,
+                fullscreen: true
+            })
+            var tempid = "x" + JSON.stringify(externalDisplay[i].x).replace("-", "n") + "y" + JSON.stringify(externalDisplay[i].y).replace("-", "n");
+
+            createWindowmulti.setMenuBarVisibility(false)
+            Object.keys(docs).forEach(function (key) {
+                var id
+                var turl
+                Object.keys(docs[key]).forEach(function (key2) {
+                    if (key2 == '_id') { id = docs[key][key2]; }
+                    if (key2 == 'url') { turl = docs[key][key2]; }
+                })
+                if(tempid == id){
+                    if(turl == ''){ turl = 'http://'; }
+                    createWindowmulti.loadURL(turl)
+                }
+             });
+            
+        }
+     });
+})
+//Extend Monitor uncomment above
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -159,23 +214,30 @@ app2.get('/admin/config', function (req, res) {
 app2.get('/admin/schedule', function (req, res) {
     res.sendFile(path.join(public, '/schedule/schedule.html'));
 });
+app2.get('/admin/extend', function (req, res) {
+    res.sendFile(path.join(public, '/extend/extend.html'));
+});
+
+app2.get('/admin/ttsh', function (req, res) {
+    res.sendFile(path.join(public, '/ttsh/ttsh.html'));
+});
 
 app2.get('/admin/screen_off.php', function (req, res) {
-var time = 1;
+    var time = 1;
 
-var interval23 = setInterval(function() { 
-   if (time <= 3) { 
-    off();
-    lightoff();
-    // console.log(time)
-      time++;
-   }
-   else { 
-      clearInterval(interval23);
-   }
-}, 10000);
+    var interval23 = setInterval(function () {
+        if (time <= 3) {
+            off();
+            lightoff();
+            // console.log(time)
+            time++;
+        }
+        else {
+            clearInterval(interval23);
+        }
+    }, 10000);
 
-res.send('off')
+    res.send('off')
     // off();
     // lightoff();
     // res.send('off')
@@ -353,9 +415,9 @@ app2.post('/writefile', (request, response) => {
 
 })
 
-// app2.post('/off', (request, response) => {
-//     off();
-// })
+app2.post('/off', (request, response) => {
+    off();
+})
 
 app2.post('/restart', (request, response) => {
     restart();
@@ -442,6 +504,81 @@ app2.post('/deleteschedule', (request, response) => {
     });
 })
 
+app2.post('/GetCurrentExtend', (request, response) => {
+
+    let displays = electron.screen.getAllDisplays()
+    let externalDisplay = [];
+
+    Object.keys(displays).forEach(function (key) {
+        Object.keys(displays[key]).forEach(function (key2) {
+            if (key2 == 'bounds') {
+                if (displays[key][key2].x !== 0 || displays[key][key2].y !== 0) {
+                    externalDisplay.push(displays[key][key2]);
+                } else { }
+            }
+        });
+    });  
+
+    //for testing
+    // var testobjectarr = [{ height: 864, width: 1537, x: 1366, y: 0 }
+    //     , { height: 864, width: 1537, x: 2732, y: 10 }
+    //     , { height: 864, width: 1537, x: 4098, y: 20 }
+    //     , { height: 864, width: 1537, x: 5464, y: 30 }
+    //     , { height: 864, width: 1537, x: 6830, y: 40 }
+    //     , { height: 864, width: 1537, x: -1366, y: -30 }
+    //     , { height: 864, width: 1537, x: -27325, y: -60345 }
+    // ]
+    //for testing
+
+    response.json(externalDisplay);
+    response.end();
+})
+
+app2.post('/getDBExtend', (request, response) => {
+    dbExt.find({}, function (err, docs) {
+        response.json(docs);
+        response.end();
+    });
+})
+
+app2.post('/saveExtend', (request, response) => {
+    //console.log(request.body);
+    Object.keys(request.body).forEach(function (key) {
+        var id
+        var turl
+        Object.keys(request.body[key]).forEach(function (key2) {
+            if (key2 == '_id') { id = request.body[key][key2]; }
+            if (key2 == 'url') { turl = request.body[key][key2]; }
+        })
+
+        dbExt.findOne({ _id: id }, function (err, doc) {
+            if(doc == null){
+                //console.log("no record")
+                dbExt.insert([{ _id: id , url: turl }], function (err, newDocs) {
+                    if (err) { console.log(err) }
+                });
+            }else{
+                dbExt.update({ _id: id }, { $set: { url: turl } }, function (err, newDoc) {
+                    if (err) { console.log(err) }
+                });
+            }
+        });
+
+    });
+
+    response.json({ msg: 1 });
+    response.end();
+})
+
+app2.post('/deleteExtend', (request, response) => {
+    dbExt.remove({ _id: request.body[0].id }, {}, function (err, numRemoved) { 
+        if(err){console.log(err)}
+        dbExt.loadDatabase();
+     });
+    response.end();
+    
+})
+
 app2.post('/login', (request, response) => {
     // console.log(request.body)//@dmin888
     if (request.body.id == "admin" && request.body.pw == "@dmin888") {
@@ -512,61 +649,66 @@ app2.post('/getServerSchedule', (request, response) => {
         if (data != '') {
             readjsondata = JSON.parse(data);
             //console.log('readingschedule:' + readjsondata)
-            if(readjsondata.serIP != ''){
-                var hostN = readjsondata.serIP.split(':')[1].replace('//','')
+            if (readjsondata.serIP != '') {
+                var hostN = readjsondata.serIP.split(':')[1].replace('//', '')
                 var portN = readjsondata.serIP.split(':')[2]
                 // console.log(hostN)
                 // console.log(portN)
-            const options = {
-                hostname: hostN,
-                port: portN,
-                path: '/Management/Device/Fetch?mac_address=' + readjsondata.iden,
-                method: 'GET'
+                const options = {
+                    hostname: hostN,
+                    port: portN,
+                    path: '/Management/Device/Fetch?mac_address=' + readjsondata.iden,
+                    method: 'GET'
+                }
+                const req = http.request(options, (res) => {
+
+                    req.on('error', (error) => {
+                        console.error(error)
+                    })
+
+                    res.on('data', (d) => {
+                        try {
+                            const jsondata = JSON.parse(d);
+
+                            //for ttsh only
+                            server_off_time = new Date(jsondata.data.list[0].screen_off);
+                            server_on_time = new Date(jsondata.data.list[0].screen_on);
+                            //for ttsh only
+
+                            //console.log(jsondata.data.list[0].screen_off)
+                            //console.log(jsondata.data.list[0].screen_on)
+                            response.json({ on: jsondata.data.list[0].screen_on, off: jsondata.data.list[0].screen_off, mac: mac });
+                            response.end();
+                        } catch (e) {
+                            errlog('getServerSchedule :' + e)
+                            // console.log(e)
+                        }
+                    })
+                })
+
+                req.end()
             }
-            const req = http.request(options, (res) => {
 
-                req.on('error', (error) => {
-                    console.error(error)
-                })
-
-                res.on('data', (d) => {
-                    try {
-                        const jsondata = JSON.parse(d);
-
-                        //for ttsh only
-                        server_off_time = new Date(jsondata.data.list[0].screen_off);
-                        server_on_time = new Date(jsondata.data.list[0].screen_on);
-                        //for ttsh only
-
-                        //console.log(jsondata.data.list[0].screen_off)
-                        //console.log(jsondata.data.list[0].screen_on)
-                        response.json({ on: jsondata.data.list[0].screen_on, off: jsondata.data.list[0].screen_off, mac: mac });
-                        response.end();
-                    } catch (e) {
-                        errlog('getServerSchedule :' + e)
-                        // console.log(e)
-                    }
-                })
-            })
-
-            req.end()
-         }
+            //for ttsh only 
+            if(readjsondata.isttsh == 1)
+            {
+                setTimeout(function () {
+                    var dtcurrent = new Date()
+                    var valid = (dtcurrent > server_off_time)
+                    var valid1 = (dtcurrent < server_on_time);
+                    // console.log(valid, valid1)
+                    if (valid && valid1) { 
+                        // console.log('valid')
+                        scclog('call /getServerSchedule :Valid time to sleep')
+                        isTimeToSleep() }else{
+                            try {clearInterval(intervalTimeSleep);} catch (e) {}
+                        }
+                }, 20000);
+            }
+            //for ttsh only
         }
     });
-    //for ttsh only 
-    setTimeout(function () {
-        var dtcurrent = new Date()
-        var valid = (dtcurrent > server_off_time)
-        var valid1 = (dtcurrent < server_on_time);
-        // console.log(valid, valid1)
-        if (valid && valid1) { 
-            // console.log('valid')
-            scclog('call /getServerSchedule :Valid time to sleep')
-            isTimeToSleep() }else{
-                try {clearInterval(intervalTimeSleep);} catch (e) {}
-            }
-    }, 20000);
-    //for ttsh only
+
 })
 
 function off() {
@@ -585,7 +727,7 @@ function off() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
-        if(code === 0){scclog('off() :Display off successfully')}
+        if (code === 0) { scclog('off() :Display off successfully') }
     });
 
 }
@@ -658,7 +800,7 @@ function restart() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
-        if(code === 0){scclog('restart() :restart successfully')}
+        if (code === 0) { scclog('restart() :restart successfully') }
     });
 }
 
@@ -667,15 +809,15 @@ function servercheck() {
     //light on
     var time2 = 1;
 
-    var interval24 = setInterval(function() { 
-       if (time2 <= 3) { 
-        lighton();
-          time2++;
-       }
-       else { 
-          clearInterval(interval24);
-       }
-    }, 10000);
+    // var interval24 = setInterval(function() { 
+    //    if (time2 <= 3) { 
+    //     lighton();
+    //       time2++;
+    //    }
+    //    else { 
+    //       clearInterval(interval24);
+    //    }
+    // }, 10000);
     //light on
 
     var hdnisrestart = 0;
@@ -692,7 +834,7 @@ function servercheck() {
                 if (list[key].name == 'Wi-Fi') {
                     if (list[key].ip_address == null) { isWifiDC = 1 };
                 }
-                
+
                 if (list[key].name.startsWith('Ethe')) {
                     if (list[key].ip_address == null) { isLanDC = 1 };
                     mac = list[key].mac_address.replace(/:/gi, '')
@@ -700,8 +842,8 @@ function servercheck() {
                 if (list[key].name.startsWith('Ethe')) { gotLAN = 1 }
                 if (list[key].name.startsWith('Wi-Fi')) { gotWIFI = 1 }
             })
-            if(gotLAN == 0){ isLanDC = 1}
-            if(gotWIFI == 0){ isWifiDC = 1}
+            if (gotLAN == 0) { isLanDC = 1 }
+            if (gotWIFI == 0) { isWifiDC = 1 }
             // console.log('gotLAN :' + gotLAN)
             // console.log('isLanDC :' + isLanDC)
             // console.log('gotWIFI :' + gotWIFI)
@@ -709,18 +851,18 @@ function servercheck() {
             // console.log('hdnisrestart.value :' + hdnisrestart)          
             if (isWifiDC == 1 && isLanDC == 1 && hdnisrestart == 0) {
                 // console.log('timerstart')
-                scclog('servercheck : restart timerstart status: ' + 'GL:'+ gotLAN + ',LID:'+ isLanDC+ ',GW:'+ gotWIFI+ ',WID:'+ isWifiDC)
+                scclog('servercheck : restart timerstart status: ' + 'GL:' + gotLAN + ',LID:' + isLanDC + ',GW:' + gotWIFI + ',WID:' + isWifiDC)
                 hdnisrestart = 1;
-                (async () => { await mainWindow.loadURL('http://localhost/admin/')})();
-                DisconTimeout10min = setTimeout(function () { 
+                (async () => { await mainWindow.loadURL('http://localhost/admin/') })();
+                DisconTimeout10min = setTimeout(function () {
                     scclog('servercheck : restarting. reason no internet')
                     setTimeout(function () { restart(); }, 10000);
-                    }, 600000);
+                }, 600000);
             }
-            
+
             if ((isWifiDC == 0 || isLanDC == 0) && hdnisrestart == 1) {
                 // console.log('timerstop')
-                scclog('servercheck : restart timerstop status: ' + 'GL:'+ gotLAN + ',LID:'+ isLanDC+ ',GW:'+ gotWIFI+ ',WID:'+ isWifiDC)
+                scclog('servercheck : restart timerstop status: ' + 'GL:' + gotLAN + ',LID:' + isLanDC + ',GW:' + gotWIFI + ',WID:' + isWifiDC)
                 hdnisrestart = 0;
                 clearTimeout(DisconTimeout10min);
                 (async () => {
@@ -779,17 +921,17 @@ function setcron(cat, Hcron, Mcron, Daycron) {
         cron.schedule(setcronstr, () => {
             scclog('server_start_cron() :from local cron')
             var time = 1;
-            var interval99 = setInterval(function() { 
-                if (time <= 3) { 
-                 off();
-                 lightoff();
-                 // console.log(time)
-                   time++;
+            var interval99 = setInterval(function () {
+                if (time <= 3) {
+                    off();
+                    lightoff();
+                    // console.log(time)
+                    time++;
                 }
-                else { 
-                   clearInterval(interval99);
+                else {
+                    clearInterval(interval99);
                 }
-             }, 10000);
+            }, 10000);
         })
     }
     if (cat == 'dss') {
@@ -812,17 +954,17 @@ function setCustomcron(cat, Daycron) {
         schedule.scheduleJob(date, function () {
             scclog('server_start_cron() :from local cron')
             var time = 1;
-            var interval99 = setInterval(function() { 
-                if (time <= 3) { 
-                 off();
-                 lightoff();
-                 // console.log(time)
-                   time++;
+            var interval99 = setInterval(function () {
+                if (time <= 3) {
+                    off();
+                    lightoff();
+                    // console.log(time)
+                    time++;
                 }
-                else { 
-                   clearInterval(interval99);
+                else {
+                    clearInterval(interval99);
                 }
-             }, 10000);
+            }, 10000);
         });
     }
     if (cat == 'css') {
@@ -855,17 +997,17 @@ function server_start_cron() {
                         cron.schedule(setcronstr, () => {
                             scclog('server_start_cron() :from local cron')
                             var time = 1;
-                            var interval99 = setInterval(function() { 
-                                if (time <= 3) { 
-                                 off();
-                                 lightoff();
-                                 // console.log(time)
-                                   time++;
+                            var interval99 = setInterval(function () {
+                                if (time <= 3) {
+                                    off();
+                                    lightoff();
+                                    // console.log(time)
+                                    time++;
                                 }
-                                else { 
-                                   clearInterval(interval99);
+                                else {
+                                    clearInterval(interval99);
                                 }
-                             }, 10000);
+                            }, 10000);
                         })
                     });
                 });
@@ -891,17 +1033,17 @@ function server_start_cron() {
                         schedule.scheduleJob(date, function () {
                             scclog('server_start_cron() :from local cron')
                             var time = 1;
-                            var interval99 = setInterval(function() { 
-                                if (time <= 3) { 
-                                 off();
-                                 lightoff();
-                                 // console.log(time)
-                                   time++;
+                            var interval99 = setInterval(function () {
+                                if (time <= 3) {
+                                    off();
+                                    lightoff();
+                                    // console.log(time)
+                                    time++;
                                 }
-                                else { 
-                                   clearInterval(interval99);
+                                else {
+                                    clearInterval(interval99);
                                 }
-                             }, 10000);
+                            }, 10000);
                         });
                     });
                 });
@@ -946,8 +1088,8 @@ function CheckserverSchedule() {
             if (data != '') {
                 readjsondata = JSON.parse(data);
                 // console.log(mac)
-                if(readjsondata.serIP != ''){
-                    var hostN = readjsondata.serIP.split(':')[1].replace('//','')
+                if (readjsondata.serIP != '') {
+                    var hostN = readjsondata.serIP.split(':')[1].replace('//', '')
                     var portN = readjsondata.serIP.split(':')[2]
                     // console.log(hostN)
                     // console.log(portN)
@@ -958,11 +1100,11 @@ function CheckserverSchedule() {
                         method: 'GET'
                     }
                     const req = http.request(options, (res) => {
-    
+
                         req.on('error', (error) => {
                             console.error(error)
                         })
-    
+
                         res.on('data', (d) => {
                             try {
                                 const jsondata = JSON.parse(d);
@@ -976,21 +1118,27 @@ function CheckserverSchedule() {
                                 var valid = (dtcurrent > server_off_time)
                                 var valid1 = (dtcurrent < server_on_time);
                                 console.log(valid, valid1)
-                                if (valid && valid1) { 
-                                    console.log('valid')
-                                    scclog('CheckserverSchedule() :Valid time to sleep')
-                                    isTimeToSleep() }else{
-                                        try {clearInterval(intervalTimeSleep);} catch (e) {}
-                                    }
+
+                                //for ttsh only
+                                if(readjsondata.isttsh == 1)
+                                {
+                                    if (valid && valid1) { 
+                                        console.log('valid')
+                                        scclog('CheckserverSchedule() :Valid time to sleep')
+                                        isTimeToSleep() }else{
+                                            try {clearInterval(intervalTimeSleep);} catch (e) {}
+                                        }
+                                }
+                                //for ttsh only
                             } catch (e) {
                                 errlog('CheckserverSchedule :' + e)
                                 // console.log(e)
                             }
                         })
                     })
-    
+
                     req.end()
-                } 
+                }
             }
         });
     }, 20000);
@@ -1030,7 +1178,7 @@ function lighton() {
 
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
-    ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT open 01"]);
+        ls = spawn('cmd.exe', ['/c', public + "\\light\\CommandApp_USBRelay.exe BITFT open 01"]);
 
     ls.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -1042,7 +1190,7 @@ function lighton() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
-        if(code === 0){scclog('lighton() :Display light on successfully')}
+        if (code === 0) { scclog('lighton() :Display light on successfully') }
     });
 
 }
@@ -1050,8 +1198,8 @@ function lighton() {
 function lightoff() {
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
-    // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
-        ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
+        // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
+        ls = spawn('cmd.exe', ['/c', public + "\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
 
     ls.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -1063,7 +1211,7 @@ function lightoff() {
 
     ls.on('exit', function (code) {
         console.log('child process exited with code ' + code);
-        if(code === 0){scclog('lightoff() :Display light off successfully')}
+        if (code === 0) { scclog('lightoff() :Display light off successfully') }
     });
 
 }
@@ -1071,8 +1219,8 @@ function lightoff() {
 function lightoffxlog() {
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
-    // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
-        ls = spawn('cmd.exe', ['/c', public+"\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
+        // ls = spawn('cmd.exe', ['/C', "powershell Powershell.exe -executionpolicy remotesigned -File  %userprofile%\\Desktop\\Light\\lightOFF.ps1"]);
+        ls = spawn('cmd.exe', ['/c', public + "\\light\\CommandApp_USBRelay.exe BITFT close 01"]);
 
     ls.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -1106,6 +1254,7 @@ function defaultConfigMacAddr() {
     });
 }
 
+//for ttsh only
 function isTimeToSleep() {
     intervalTimeSleep = setInterval(function() { 
         var time = 1;
@@ -1127,9 +1276,10 @@ function isTimeToSleep() {
             restart();
             // try {clearInterval(intervalTimeSleep);} catch (e) {}
         }
-         
+
      }, 290000);
 }
+//for ttsh only
 
 process.on('uncaughtException', function (err) {
     console.log(err);
@@ -1144,6 +1294,7 @@ server.listen(80, function () {
     CheckserverSchedule();
     openlink();
     defaultConfigMacAddr();
+
 });
 
 
@@ -1157,11 +1308,11 @@ fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data)
     var readjsondata;
     if (data != '') {
         readjsondata = JSON.parse(data);
-        
+
         if(readjsondata.serIP != ''){
             var hostN = readjsondata.serIP.split(':')[1].replace('//','')
             var portN = readjsondata.serIP.split(':')[2]
- 
+
         const options = {
             hostname: hostN,
             port: portN,
@@ -1194,7 +1345,7 @@ fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data)
       }
     });
     res.json({ "result": "ok" });
-    
+
 });
 
 setInterval(function () {

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<div>
+
+    <head>
+        <script type="text/javascript" src="../js/fetch.js"></script>
+        <script type="text/javascript" src="../js/polyfill.min.js"></script>
+        <script type="text/javascript" src="./extend.js"></script>
+        <link rel="stylesheet" type="text/css" href="../css/main.css" />
+        <link rel="stylesheet" type="text/css" href="../css/my.css" />
+        <script src='/socket.io/socket.io.js'></script>
+
+        <div id="ExtendPageTitle">
+            <a onclick='return logout()' class="logout">Logout &nbsp;&nbsp;&nbsp;<span>&#10170;</span> </a>
+            <a class="schedule" onclick='return backConfig()'> Configuration
+                &nbsp;&nbsp;&nbsp;<span>&#10170;</span> </a>
+            <h1 style="text-align: center;">Monitor Extend</h1>
+        </div>
+
+    </head>
+
+    <body onload="Setdefault()">
+        <div class="content" style="max-width:900px;">
+            <div style="margin: auto;" class="row">
+                <div style="width: 70%;" class="columnContent">
+                    <label class="configtitle">Unassign Displays</label>
+                    <div style="margin-top: 10px; border: 1px solid silver;max-width: 700px;margin: auto;"> </div>
+                </div>
+                <div style="width: 20%;float:left;padding-left: 2%;">
+                    <button onclick='return DRbtnClick()'>DETECT & REFRESH</button>
+                </div>
+            </div>
+            <div style="margin-top: 20px;max-width: 900px;" class="content">
+                    <div style="max-width: 900px;" id="MunAList"></div>
+            </div>
+
+            <div style="margin: auto;" class="row">
+                    <div style="width: 70%;" class="columnContent">
+                        <label class="configtitle">Assigned Displays</label>
+                        <div style="margin-top: 10px; border: 1px solid silver;max-width: 700px;margin: auto;"> </div>
+                    </div>
+                    <div style="width: 20%;float:left;padding-left: 2%;">
+                         <button id='showSave' onclick='return SAbtnClick()'>SAVE & APPLY</button>
+                    </div>
+            </div>
+
+            <div style="margin-top: 20px;max-width: 900px;" class="content">
+                    <div style="max-width: 900px;">
+                    <ul  id="MAList"></ul>
+                    </div>
+            </div>
+            
+
+        </div>
+    </body>
+
+    <!-- pop out -->
+    <div id='popmsg' style="display:none;height: 70px;">
+        <div style="margin-top: -2%;" class="row">
+            <div style="width:80%;" class="column">
+                <div style="font-weight: bold;font-family: sans-serif;" id='popmsgcontent'></div>
+            </div>
+            <div style="width:20%;margin-top:1%" class="column"><span
+                    onclick="this.parentElement.parentElement.parentElement.style.display='none';"
+                    class="closebtn">&times;</span></div>
+        </div>
+    </div>
+    <!-- pop out -->
+
+</div>

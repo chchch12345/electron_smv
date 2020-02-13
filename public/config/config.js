@@ -33,14 +33,15 @@ function confirm_off(el) {
     // }
 }
 
-function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag) {
+function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh) {
     console.log(txtiden.value)
     const iden = IDENTITY;
     const serIP = IP;
     const serIPcus = IPcus;
     const isSerdefault = Flag;
     const isSchdefault = SchFlag;
-    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault };
+    const isttsh = ttsh;
+    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh };
     const options = {
         method: 'POST',
         headers: {
@@ -218,6 +219,26 @@ function Setdefault() {
 
             });
         })
+
+    fetch('/GetCurrentExtend', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            //console.log(data.length)
+            if(data.length >0){
+                document.getElementById("showExtend").style.display = "block";
+                document.getElementById("showttsh2").style.display = "block";
+                document.getElementById("showttsh1").style.display = "none";
+                
+            }else{
+                document.getElementById("showExtend").style.display = "none";
+                document.getElementById("showttsh1").style.display = "block";
+                document.getElementById("showttsh2").style.display = "none";
+
+            }
+        })
+
+
     return true;
 };
 
@@ -243,28 +264,28 @@ function serConSave() {
             var schetype = document.querySelector('input[name="cake"]:checked').value
             if (document.querySelector('input[name="drone"]:checked').value == 1) {
                 if (txtserurl.value == '') {
-                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype);
+                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
                     hdnDIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocoldef").value == 'nots') {
                         hdnDIP.value = 'nots';
-                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype);
+                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
                     } else {
                         hdnDIP.value = 'gots';
-                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype);
+                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
                     }
                 }
             } else {
                 if (txtserurlcustom.value == '') {
-                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype);
+                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
                     hdnCIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocolcus").value == 'nots') {
                         hdnCIP.value = 'nots';
-                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype);
+                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
                     } else {
                         hdnCIP.value = 'gots';
-                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype);
+                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
                     }
                 }
             }
@@ -291,7 +312,7 @@ function handleClick(drone) {
         // document.getElementById("txtserurl").style.display = "none";
         // document.getElementById("txtserurlcustom").style.display = "block"
 
-        document.getElementById("customIPdiv").style.display = "block";;
+        document.getElementById("customIPdiv").style.display = "block";
     }
 }
 
@@ -309,6 +330,19 @@ function Goshc() {
 
     return true;
 }
+
+function Goext() {
+    window.location.href = '../extend';
+
+    return true;
+}
+
+function Gottsh() {
+    window.location.href = '../ttsh';
+
+    return true;
+}
+
 
 function ConfirmPopOFF() {
     document.getElementById("popmsgqueryoff").className = "alertConfirm";

@@ -1,0 +1,60 @@
+<html>
+
+<head>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script> -->
+    <script type="text/javascript" src="../js/fetch.js"></script>
+    <script type="text/javascript" src="../js/polyfill.min.js"></script>
+    <script type="text/javascript" src="./ttsh.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="../css/my.css" />
+    <link rel="stylesheet" type="text/css" href="../css/loader.css" />
+    <script src='/socket.io/socket.io.js'></script>
+
+    <!-- position: fixed; bottom: 0; left: 43%; &#10149-->
+    <div id="ContentPageTitle">
+        <span onclick='return backConfig()' class="logout">Back &nbsp;&nbsp;&nbsp;<span>&#10170;</span> </span>
+        <h1 style="text-align: center;">TTSH</h1>
+    </div>
+
+</head>
+
+<body onload="Setdefault()">
+    <div id="ContentPage">
+        <div class="content">
+            <div style="margin: auto;" class="row">
+                <div style="width: 15%;" class="columnContent">
+                    <label class="configlabel">FUNCTIONALITY</label>
+                </div>
+                <div style="width: 60%;" class="columnContent">
+                    <select id="ddlfunctionality" style="width: auto;cursor: pointer; margin-left: 8%;">
+                        <option value="1">ON</option>
+                        <option value="0">OFF</option>
+                    </select>
+                </div>
+                <!-- <div style="width: 50%;" class="columnContent">
+                    <input style="width:100%" type="text" id='txtserurl' />
+
+                </div> -->
+                <div style="width: 25%;float:left;padding-left: 2%;">
+                    <button onclick='return btnSave()'>SAVE</button>
+                </div>
+            </div>           
+
+</body>
+
+<!-- pop out -->
+<div id='popmsg' style="display:none;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:80%;" class="column">
+            <div style="font-weight: bold;font-family: sans-serif;" id='popmsgcontent'></div>
+        </div>
+        <div style="width:20%;margin-top:1%" class="column"><span
+                onclick="this.parentElement.parentElement.parentElement.style.display='none';"
+                class="closebtn">&times;</span></div>
+    </div>
+</div>
+<!-- pop out -->
+
+</html>

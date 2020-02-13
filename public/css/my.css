@@ -28,25 +28,75 @@ label.custom {
 
 
 .logout {
-    pointer-events:auto;
+    /* pointer-events:auto; */
     /* width: 30px; */
-    position: fixed;
+    /* position: fixed;
     top: 10%;
     right: 150px;
     cursor: pointer;
     font-family: monospace;
     font-size: 15px;
-    color: lightslategray;
+    color: lightslategray; */
+
+    pointer-events:auto;
+    position: fixed;
+    right: 150px;
+    top: 10%;
+    cursor: pointer;
+    float: none;
+    padding: 0px;
+    margin: 0px;
 }
 
 .schedule {
     /* width: 30px; */
     pointer-events:auto;
     position: fixed;
-    right: 90px;
-    bottom: 5%;
+    right: 150px;
+    top: 17%;
     cursor: pointer;
+    float: none;
+    padding: 0px;
+    margin: 0px;
 }
+
+.me {
+    /* width: 30px; */
+    pointer-events:auto;
+    position: fixed;
+    right: 150px;
+    top: 24%;
+    cursor: pointer;
+    float: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.ttsh1 {
+    /* width: 30px; */
+    pointer-events:auto;
+    position: fixed;
+    right: 150px;
+    top: 24%;
+    cursor: pointer;
+    float: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.ttsh2 {
+    /* width: 30px; */
+    pointer-events:auto;
+    position: fixed;
+    right: 150px;
+    top: 31%;
+    cursor: pointer;
+    float: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+
 
 .Logincontent {
     padding-bottom: 15px;
@@ -172,6 +222,12 @@ a{
     margin-bottom: 15px;
     margin: auto;
     max-width: 810px;
+}
+
+.Extendlabelstyle{
+    margin: 0;
+    color: lightslategray;
+    font-family: monospace;
 }
 
  

@@ -12,10 +12,13 @@
     <link rel="stylesheet" type="text/css" href="../css/loader.css" />
     <script src='/socket.io/socket.io.js'></script>
 
-    <!-- position: fixed; bottom: 0; left: 43%; -->
+    <!-- position: fixed; bottom: 0; left: 43%; &#10149-->
     <div id="ContentPageTitle">
-        <label onclick='return logout()' class="logout">Logout &nbsp;&nbsp;&nbsp;<span>&#10149;</span> </label>
+        <a onclick='return logout()' class="logout">Logout &nbsp;&nbsp;&nbsp;<span>&#10170;</span> </a>
         <a class="schedule" onclick='return Goshc()'>Schedule &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a id='showExtend' class="me" onclick='return Goext()'>Monitor Extend &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a id='showttsh1' class="ttsh1" onclick='return Gottsh()'>TTSH &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a id='showttsh2' class="ttsh2" onclick='return Gottsh()'>TTSH &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
         <!-- <img onclick='return logout()' class="logout" src="../icon/exit.png" /> -->
         <h1 style="text-align: center;">Configuration</h1>
     </div>
@@ -58,7 +61,6 @@
                     <input style="width:100%" type="text" id='txtserurlcustom' />
                 </div>
             </div>
-
             <div class="content">
                 <div style="margin: auto; margin-top: 10px;" class="row">
                     <div class="columnContent">
