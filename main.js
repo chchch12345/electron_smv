@@ -244,7 +244,7 @@ app2.get('/admin/screen_off.php', function (req, res) {
 })
 
 app2.get('/admin/reboot.php', function (req, res) {
-    res.send('restart')
+    res.send('restartt' + os)
     restart();
 
 })
@@ -712,6 +712,7 @@ app2.post('/getServerSchedule', (request, response) => {
 })
 
 function off() {
+	if(os == 'windows') {
     // scclog('off() :Display off successfully')
     //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
     var spawn = require('child_process').spawn,
@@ -729,6 +730,10 @@ function off() {
         console.log('child process exited with code ' + code);
         if (code === 0) { scclog('off() :Display off successfully') }
     });
+
+	} else if (os == 'ubuntu') {
+		require('child_process').execSync('xset dpms force off');
+	}
 
 }
 
@@ -785,7 +790,14 @@ function on() {
 
 }
 
+var os = 'windows';
+
+var ostest = require('child_process').execSync('lsb_release -a');
+if(ostest.includes("Ubuntu")) os = 'ubuntu';
+
 function restart() {
+	if(os == 'windows') {
+
     // scclog('restart() :Reboot successfully')
     var spawn = require('child_process').spawn,
         ls = spawn('cmd.exe', ['/C', "shutdown /r /f /t 0"]);
@@ -802,6 +814,10 @@ function restart() {
         console.log('child process exited with code ' + code);
         if (code === 0) { scclog('restart() :restart successfully') }
     });
+}
+	else if (os == 'ubuntu') {
+		require('child_process').execSync('sudo reboot');
+	}
 }
 
 function servercheck() {
@@ -830,16 +846,17 @@ function servercheck() {
             var isLanDC = 0;
             var gotLAN = 0;
             var gotWIFI = 0;
+
             Object.keys(list).forEach(function (key) {
                 if (list[key].name == 'Wi-Fi') {
                     if (list[key].ip_address == null) { isWifiDC = 1 };
                 }
 
-                if (list[key].name.startsWith('Ethe')) {
+                if (list[key].name.startsWith('Ethe') || (os == 'ubuntu' && list[key].name.startsWith('eth'))) {
                     if (list[key].ip_address == null) { isLanDC = 1 };
                     mac = list[key].mac_address.replace(/:/gi, '')
                 }
-                if (list[key].name.startsWith('Ethe')) { gotLAN = 1 }
+                if (list[key].name.startsWith('Ethe')  || (os == 'ubuntu' && list[key].name.startsWith('eth'))) { gotLAN = 1 }
                 if (list[key].name.startsWith('Wi-Fi')) { gotWIFI = 1 }
             })
             if (gotLAN == 0) { isLanDC = 1 }
@@ -875,7 +892,7 @@ function servercheck() {
 }
 
 function openlink() {
-    //const open = require('open');
+	    //const open = require('open');
     //const sendkeys = require('sendkeys-js')
     // var myInterval =  setInterval(function () {   
     //     if(mac !== '000000000000'){
@@ -883,11 +900,14 @@ function openlink() {
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         if (err) throw err;
         //jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden 
-        var jsondata;
+       
+var jsondata;
         if (data != '') {
+
             jsondata = JSON.parse(data);
             if (jsondata.isSerdefault == '1') {
-                if (jsondata.serIP != '') { seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden }
+                if (jsondata.serIP != '') { 
+seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden }
                 else { seturl = 'http://localhost/admin' }
             } else {
                 if (jsondata.serIPcus != '') { seturl = jsondata.serIPcus }
@@ -1117,7 +1137,7 @@ function CheckserverSchedule() {
                                 server_on_time = new Date(jsondata.data.list[0].screen_on);
                                 var valid = (dtcurrent > server_off_time)
                                 var valid1 = (dtcurrent < server_on_time);
-                                console.log(valid, valid1)
+                                console.log("Schedule validation status", valid + " " + valid1)
 
                                 //for ttsh only
                                 if(readjsondata.isttsh == 1)

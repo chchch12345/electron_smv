@@ -195,7 +195,7 @@ function Setdefault() {
                         document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/error_log'")
                     }
                 }
-                if (data[key].name.startsWith('Ethe')) {
+                if (data[key].name.startsWith('Ethe') || data[key].name.startsWith('eth')) {
                     //cont
                     document.getElementById('lblcontethmac').innerHTML = data[key].mac_address;
                     document.getElementById('lblcontethip').innerHTML = data[key].ip_address == null ? '0.0.0.0' : data[key].ip_address;
