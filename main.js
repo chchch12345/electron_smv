@@ -792,8 +792,10 @@ function on() {
 
 var os = 'windows';
 
-var ostest = require('child_process').execSync('lsb_release -a');
-if(ostest.includes("Ubuntu")) os = 'ubuntu';
+try {
+	var ostest = require('child_process').execSync('lsb_release -a');
+	if(ostest.includes("Ubuntu")) os = 'ubuntu';
+} catch (ex) {}
 
 function restart() {
 	if(os == 'windows') {
