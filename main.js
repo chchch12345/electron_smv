@@ -12,7 +12,6 @@ var cors = require('cors')
 var public = path.join(__dirname, 'public');
 var upload = require("express-fileupload");
 var Datastore = require('nedb')
-const { audio, display } = require('system-control');
 //'C:/SMV_venue_client/schedules.db'
 const db = new Datastore({ filename: public + '/schedules.db', autoload: true });
 const log = require('error-log-file')
