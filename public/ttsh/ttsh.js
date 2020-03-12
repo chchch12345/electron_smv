@@ -1,12 +1,14 @@
 
-function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag, ttsh) {
+function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag, ttsh, SS , SSvalue) {
     const iden = IDENTITY;
     const serIP = IP;
     const serIPcus = IPcus;
     const isSerdefault = Flag;
     const isSchdefault = SchFlag;
     const isttsh = ttsh;
-    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh };
+    const isScreenShot = SS;
+    const SSInt = SSvalue;
+    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh , isScreenShot: isScreenShot , SSInt: SSInt };
     const options = {
         method: 'POST',
         headers: {
@@ -75,7 +77,7 @@ function btnSave() {
     })
         .then(function (data) {
             console.log(data)
-            FooSet(data.serIP, data.serIPcus,  data.iden , data.isSerdefault , data.isSchdefault,  document.getElementById("ddlfunctionality").value );
+            FooSet(data.serIP, data.serIPcus,  data.iden , data.isSerdefault , data.isSchdefault,  document.getElementById("ddlfunctionality").value  , data.isScreenShot  , data.SSInt );
         })
 }
 

@@ -1,3 +1,5 @@
+
+
 function confirm_restart(el) {
 
     el.parentNode.parentNode.style.display = 'none';
@@ -33,7 +35,57 @@ function confirm_off(el) {
     // }
 }
 
-function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh) {
+function confirm_system(el) {
+    el.parentNode.parentNode.style.display = 'none';
+
+    // console.log(document.getElementById("InpVol").value)
+    // console.log(document.getElementById("InpBrig").value)
+    
+    const data = { volume: document.getElementById("InpVol").value, brightness: document.getElementById("InpBrig").value};
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    };
+    fetch('/SetVolB', options).then(function (data) {});
+
+    return true;
+}
+
+function confirm_screenshot(el) {
+    el.parentNode.parentNode.style.display = 'none';
+
+    console.log(document.getElementById("ddlSS").value)
+
+    if(Number(document.getElementById("SSIntTxt").value)<30)
+    {
+        document.getElementById("SSIntTxt").value = 30
+    }
+    if(Number(document.getElementById("SSIntTxt").value)>3600)
+    {
+        document.getElementById("SSIntTxt").value = 3600
+    }
+    console.log(document.getElementById("SSIntTxt").value)
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    fetch('/fetchdata', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            console.log(data)
+            FooSet(data.serIP, data.serIPcus,  data.iden , data.isSerdefault , data.isSchdefault,  data.isttsh , document.getElementById("ddlSS").value , document.getElementById("SSIntTxt").value );
+            fetch('/updateSS', options).then(function (response) {})
+        })  
+}
+
+function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh , SS , SSvalue) {
     console.log(txtiden.value)
     const iden = IDENTITY;
     const serIP = IP;
@@ -41,7 +93,9 @@ function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh) {
     const isSerdefault = Flag;
     const isSchdefault = SchFlag;
     const isttsh = ttsh;
-    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh };
+    const isScreenShot = SS;
+    const SSInt = SSvalue;
+    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh , isScreenShot: isScreenShot , SSInt: SSInt };
     const options = {
         method: 'POST',
         headers: {
@@ -94,6 +148,7 @@ function Setdefault() {
     document.getElementById("btnreset").className = 'freeze';
     document.getElementById("btnsslog").className = 'freeze';
     document.getElementById("btneelog").className = 'freeze';
+    document.getElementById("btnss").className = 'freeze';
 
     var isemptyfile = 0;
     var ethmac = '';
@@ -193,6 +248,7 @@ function Setdefault() {
                     if (data[key].ip_address != null) {
                         document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/success_log'")
                         document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/error_log'")
+                        document.querySelector('#btnss').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/zip'")
                     }
                 }
                 if (data[key].name.startsWith('Ethe') || data[key].name.startsWith('eth')) {
@@ -211,9 +267,11 @@ function Setdefault() {
                     document.getElementById("btnreset").className = '';
                     document.getElementById("btnsslog").className = '';
                     document.getElementById("btneelog").className = '';
+                    document.getElementById("btnss").className = '';
                     if (data[key].ip_address != null) {
                         document.querySelector('#btnsslog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/success_log'")
                         document.querySelector('#btneelog').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/admin/download/error_log'")
+                        document.querySelector('#btnss').setAttribute("onclick", "window.location='http://" + data[key].ip_address + "/zip'")
                     }
                 }
 
@@ -264,28 +322,28 @@ function serConSave() {
             var schetype = document.querySelector('input[name="cake"]:checked').value
             if (document.querySelector('input[name="drone"]:checked').value == 1) {
                 if (txtserurl.value == '') {
-                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
+                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     hdnDIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocoldef").value == 'nots') {
                         hdnDIP.value = 'nots';
-                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
+                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     } else {
                         hdnDIP.value = 'gots';
-                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh);
+                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     }
                 }
             } else {
                 if (txtserurlcustom.value == '') {
-                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
+                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     hdnCIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocolcus").value == 'nots') {
                         hdnCIP.value = 'nots';
-                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
+                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     } else {
                         hdnCIP.value = 'gots';
-                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh);
+                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
                     }
                 }
             }
@@ -353,6 +411,85 @@ function ConfirmPopRES() {
     document.getElementById("popmsgqueryrestart").className = "alertConfirm";
     document.getElementById("popmsgqueryrestart").style.display = "block";
 }
+
+
+function ConfirmPopSys() {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    fetch('/GetVolB', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            //console.log(data)
+            document.getElementById("InpVol").value = data.v
+            document.getElementById("txtvol").textContent = data.v
+            document.getElementById("InpBrig").value = data.b*10
+            document.getElementById("txtbrig").textContent = data.b*10
+
+            document.getElementById("popSystemControl").className = "alertConfirm2";
+            document.getElementById("popSystemControl").style.display = "block";
+        })
+}
+
+function updateTxtvol(v) {
+    document.getElementById("txtvol").textContent = v;    
+}
+
+function updateTxtbrig(v) {
+    document.getElementById("txtbrig").textContent = v;    
+}
+
+function ConfirmPopSS() {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    fetch('/fetchdata', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            console.log(data)
+            if (data.empty) {
+                isemptyfile = 1;
+            } else {
+
+                document.getElementById("ddlSS").value = data.isScreenShot
+                document.getElementById("SSIntTxt").value = data.SSInt
+
+                document.getElementById("popScreenShotControl").className = "alertConfirm2";
+                document.getElementById("popScreenShotControl").style.display = "block";
+            
+                if(document.getElementById("ddlSS").value == 1)
+                {
+                    document.getElementById("SSIntDiv").style.display = "block";
+                }else{
+                    document.getElementById("SSIntDiv").style.display = "none";
+                }
+            }
+        })
+    return true;
+}
+
+function dllSSonchange() {
+    if(document.getElementById("ddlSS").value == 1)
+    {
+        document.getElementById("SSIntDiv").style.display = "block";
+    }else{
+        document.getElementById("SSIntDiv").style.display = "none";
+    }
+}
+
+
+
+
 
 
 

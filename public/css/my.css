@@ -224,6 +224,22 @@ a{
     max-width: 810px;
 }
 
+.alertConfirm2{
+    opacity: 0.9;
+    height: 105px;
+    position: fixed;
+    top: 30%;
+    right: 38%;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: lightsteelblue;
+    color: black;
+    margin-bottom: 15px;
+    margin: auto;
+    max-width: 810px;
+}
+
+
 .Extendlabelstyle{
     margin: 0;
     color: lightslategray;

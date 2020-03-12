@@ -21,6 +21,12 @@ var server_off_time;
 var server_on_time;
 var intervalTimeSleep;
 const dbExt = new Datastore({ filename: public + '/ExtendMonitor.db', autoload: true });
+const { audio, display } = require('system-control');
+const screenshot = require('screenshot-desktop')
+const os = require('os');
+const desktopDir = path.join(os.homedir(), 'Desktop/elec_pic');
+var intervalScreenShot;
+const zip = require('express-easy-zip');
 
 //W
 var app3 = express();
@@ -71,6 +77,7 @@ app.on('ready', createWindow)
 //Extend Monitor uncomment below
 app.on('ready', () => {
     let displays = electron.screen.getAllDisplays()
+    //console.log(displays);
     let externalDisplay = [];
     // let picurl = [];
 
@@ -92,7 +99,7 @@ app.on('ready', () => {
     });
     //console.log(externalDisplay.length)
     dbExt.find({}, function (err, docs) {
-         for (var i in externalDisplay) {
+        for (var i in externalDisplay) {
 
             let createWindowmulti = new BrowserWindow({
                 x: externalDisplay[i].x,
@@ -109,14 +116,14 @@ app.on('ready', () => {
                     if (key2 == '_id') { id = docs[key][key2]; }
                     if (key2 == 'url') { turl = docs[key][key2]; }
                 })
-                if(tempid == id){
-                    if(turl == ''){ turl = 'http://'; }
+                if (tempid == id) {
+                    if (turl == '') { turl = 'http://'; }
                     createWindowmulti.loadURL(turl)
                 }
-             });
-            
+            });
+
         }
-     });
+    });
 })
 //Extend Monitor uncomment above
 
@@ -201,6 +208,7 @@ function handleSquirrelEvent(application) {
 
 app2.use(cors())
 app2.use(upload())
+app2.use(zip());
 
 app2.use('/admin', express.static(path.join(__dirname, 'public')));
 app2.use(express.json({ limit: '1mb' }));
@@ -244,7 +252,7 @@ app2.get('/admin/screen_off.php', function (req, res) {
 })
 
 app2.get('/admin/reboot.php', function (req, res) {
-    res.send('restartt' + os)
+    res.send('restartt' + osW)
     restart();
 
 })
@@ -289,6 +297,31 @@ app2.get('/admin/download/error_log', function (req, res) {
     // const file = `${public}/log/` + date.getFullYear() + `_error_log.txt`;
     res.download(file); // Set disposition and send it.
 });
+
+app2.use('/zip', function (req, res) {
+    res.zip({
+        files: [
+            { path: path.join(public, './screenshot/'), name: 'screenshot' }    //or a folder
+        ],
+        filename: 'Venue360_screenshot.zip'
+    });
+});
+
+//delete ss
+// app2.get('/delete/ss', function (req, res) {
+//     var dir = path.join(public, 'screenshot');
+//     fs.readdir(dir, (err, files) => {
+//         if (err) throw err;
+
+//         for (const file of files) {
+//           fs.unlink(path.join(dir, file), err => {
+//             if (err) throw err;
+//           });
+//         }
+//       });
+// });
+
+
 
 const server = http.createServer(app2);
 const io = socketIo(server);
@@ -415,6 +448,35 @@ app2.post('/writefile', (request, response) => {
 
 })
 
+app2.post('/SetVolB', (request, response) => {
+    var vol
+    var bright
+
+    Object.keys(request.body).forEach(function (key) {
+        if (key == 'volume') { vol = request.body[key]; }
+        if (key == 'brightness') { bright = request.body[key]; }
+    });
+
+    SetvolumeBrightness(vol, bright);
+
+    response.json({ msg: 1 });
+    response.end();
+})
+
+app2.post('/GetVolB', (request, response) => {
+    (async () => {
+        //console.log(await audio.volume() +  '    ' +  await display.brightness())
+        var data = { v: await audio.volume(), b: await display.brightness() }
+
+        response.json(data);
+        response.end();
+    })()
+})
+
+app2.post('/updateSS', (request, response) => {
+    IntervalDesktopScreenShot();
+})
+
 app2.post('/off', (request, response) => {
     off();
 })
@@ -517,7 +579,7 @@ app2.post('/GetCurrentExtend', (request, response) => {
                 } else { }
             }
         });
-    });  
+    });
 
     //for testing
     // var testobjectarr = [{ height: 864, width: 1537, x: 1366, y: 0 }
@@ -552,12 +614,12 @@ app2.post('/saveExtend', (request, response) => {
         })
 
         dbExt.findOne({ _id: id }, function (err, doc) {
-            if(doc == null){
+            if (doc == null) {
                 //console.log("no record")
-                dbExt.insert([{ _id: id , url: turl }], function (err, newDocs) {
+                dbExt.insert([{ _id: id, url: turl }], function (err, newDocs) {
                     if (err) { console.log(err) }
                 });
-            }else{
+            } else {
                 dbExt.update({ _id: id }, { $set: { url: turl } }, function (err, newDoc) {
                     if (err) { console.log(err) }
                 });
@@ -571,12 +633,12 @@ app2.post('/saveExtend', (request, response) => {
 })
 
 app2.post('/deleteExtend', (request, response) => {
-    dbExt.remove({ _id: request.body[0].id }, {}, function (err, numRemoved) { 
-        if(err){console.log(err)}
+    dbExt.remove({ _id: request.body[0].id }, {}, function (err, numRemoved) {
+        if (err) { console.log(err) }
         dbExt.loadDatabase();
-     });
+    });
     response.end();
-    
+
 })
 
 app2.post('/login', (request, response) => {
@@ -690,19 +752,19 @@ app2.post('/getServerSchedule', (request, response) => {
             }
 
             //for ttsh only 
-            if(readjsondata.isttsh == 1)
-            {
+            if (readjsondata.isttsh == 1) {
                 setTimeout(function () {
                     var dtcurrent = new Date()
                     var valid = (dtcurrent > server_off_time)
                     var valid1 = (dtcurrent < server_on_time);
                     // console.log(valid, valid1)
-                    if (valid && valid1) { 
+                    if (valid && valid1) {
                         // console.log('valid')
                         scclog('call /getServerSchedule :Valid time to sleep')
-                        isTimeToSleep() }else{
-                            try {clearInterval(intervalTimeSleep);} catch (e) {}
-                        }
+                        isTimeToSleep()
+                    } else {
+                        try { clearInterval(intervalTimeSleep); } catch (e) { }
+                    }
                 }, 20000);
             }
             //for ttsh only
@@ -711,29 +773,49 @@ app2.post('/getServerSchedule', (request, response) => {
 
 })
 
+function SetvolumeBrightness(v, b) {
+    (async () => {
+        try {
+            //console.log(v +'  '+b)
+            await audio.volume(Number(v)) // set system volume
+            if (Number(v) != 0) {
+                await audio.muted(false)
+            } else {
+                await audio.muted(true)
+            }
+            var b10
+            if (b != 0) { b10 = b / 10; } else { b10 = 0; }
+            await display.brightness(b10)
+            //console.log('success')
+        } catch (e) {
+            console.error(e);
+        }
+
+    })()
+}
+
 function off() {
-	if(os == 'windows') {
-    // scclog('off() :Display off successfully')
-    //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
-    var spawn = require('child_process').spawn,
-        ls = spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
+    if (osW == 'windows') {
+        // scclog('off() :Display off successfully')
+        //require('child_process').spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
+        var spawn = require('child_process').spawn,
+            ls = spawn('cmd.exe', ['/C', "powershell (Add-Type '[DllImport(\"user32.dll\")]^public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);' -Name a -Pas)::SendMessage(-1,0x0112,0xF170,2)"]);
 
-    ls.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);
-    });
+        ls.stdout.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
 
-    ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
-    });
+        ls.stderr.on('data', function (data) {
+            console.log('stderr: ' + data);
+        });
 
-    ls.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
-        if (code === 0) { scclog('off() :Display off successfully') }
-    });
-
-	} else if (os == 'ubuntu') {
-		require('child_process').execSync('xset dpms force off');
-	}
+        ls.on('exit', function (code) {
+            console.log('child process exited with code ' + code);
+            if (code === 0) { scclog('off() :Display off successfully') }
+        });
+    } else if (osW == 'ubuntu') {
+        require('child_process').execSync('xset dpms force off');
+    }
 
 }
 
@@ -790,16 +872,15 @@ function on() {
 
 }
 
-var os = 'windows';
+var osW = 'windows';
 
 try {
 	var ostest = require('child_process').execSync('lsb_release -a');
-	if(ostest.includes("Ubuntu")) os = 'ubuntu';
+	if(ostest.includes("Ubuntu")) osW = 'ubuntu';
 } catch (ex) {}
 
 function restart() {
-	if(os == 'windows') {
-
+    if(osW == 'windows') {
     // scclog('restart() :Reboot successfully')
     var spawn = require('child_process').spawn,
         ls = spawn('cmd.exe', ['/C', "shutdown /r /f /t 0"]);
@@ -816,8 +897,8 @@ function restart() {
         console.log('child process exited with code ' + code);
         if (code === 0) { scclog('restart() :restart successfully') }
     });
-}
-	else if (os == 'ubuntu') {
+    }
+    else if (osW == 'ubuntu') {
 		require('child_process').execSync('sudo reboot');
 	}
 }
@@ -848,17 +929,16 @@ function servercheck() {
             var isLanDC = 0;
             var gotLAN = 0;
             var gotWIFI = 0;
-
             Object.keys(list).forEach(function (key) {
                 if (list[key].name == 'Wi-Fi') {
                     if (list[key].ip_address == null) { isWifiDC = 1 };
                 }
 
-                if (list[key].name.startsWith('Ethe') || (os == 'ubuntu' && list[key].name.startsWith('eth'))) {
+                if (list[key].name.startsWith('Ethe') || (osW == 'ubuntu' && list[key].name.startsWith('eth'))) {
                     if (list[key].ip_address == null) { isLanDC = 1 };
                     mac = list[key].mac_address.replace(/:/gi, '')
                 }
-                if (list[key].name.startsWith('Ethe')  || (os == 'ubuntu' && list[key].name.startsWith('eth'))) { gotLAN = 1 }
+                if (list[key].name.startsWith('Ethe')  || (osW == 'ubuntu' && list[key].name.startsWith('eth'))) { gotLAN = 1 }
                 if (list[key].name.startsWith('Wi-Fi')) { gotWIFI = 1 }
             })
             if (gotLAN == 0) { isLanDC = 1 }
@@ -894,7 +974,7 @@ function servercheck() {
 }
 
 function openlink() {
-	    //const open = require('open');
+    //const open = require('open');
     //const sendkeys = require('sendkeys-js')
     // var myInterval =  setInterval(function () {   
     //     if(mac !== '000000000000'){
@@ -902,14 +982,11 @@ function openlink() {
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
         if (err) throw err;
         //jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden 
-       
-var jsondata;
+        var jsondata;
         if (data != '') {
-
             jsondata = JSON.parse(data);
             if (jsondata.isSerdefault == '1') {
-                if (jsondata.serIP != '') { 
-seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden }
+                if (jsondata.serIP != '') { seturl = jsondata.serIP + '/Web/displaySignage.html#/view/' + jsondata.iden }
                 else { seturl = 'http://localhost/admin' }
             } else {
                 if (jsondata.serIPcus != '') { seturl = jsondata.serIPcus }
@@ -1141,15 +1218,16 @@ function CheckserverSchedule() {
                                 var valid1 = (dtcurrent < server_on_time);
                                 console.log("Schedule validation status", valid + " " + valid1)
 
+
                                 //for ttsh only
-                                if(readjsondata.isttsh == 1)
-                                {
-                                    if (valid && valid1) { 
+                                if (readjsondata.isttsh == 1) {
+                                    if (valid && valid1) {
                                         console.log('valid')
                                         scclog('CheckserverSchedule() :Valid time to sleep')
-                                        isTimeToSleep() }else{
-                                            try {clearInterval(intervalTimeSleep);} catch (e) {}
-                                        }
+                                        isTimeToSleep()
+                                    } else {
+                                        try { clearInterval(intervalTimeSleep); } catch (e) { }
+                                    }
                                 }
                                 //for ttsh only
                             } catch (e) {
@@ -1278,30 +1356,70 @@ function defaultConfigMacAddr() {
 
 //for ttsh only
 function isTimeToSleep() {
-    intervalTimeSleep = setInterval(function() { 
+    intervalTimeSleep = setInterval(function () {
         var time = 1;
-        var intervalsleep = setInterval(function() { 
-            if (time <= 3) { 
-             offxlog();
-             lightoffxlog();
-               time++;
+        var intervalsleep = setInterval(function () {
+            if (time <= 3) {
+                offxlog();
+                lightoffxlog();
+                time++;
             }
-            else { 
-               clearInterval(intervalsleep);
+            else {
+                clearInterval(intervalsleep);
             }
-         }, 10000);
+        }, 10000);
 
         var dtcurrent = new Date()
         var valid = (dtcurrent >= server_on_time)
-        if(valid){
+        if (valid) {
             scclog('isTimeToSleep() interval :local time > server_on_time run restart from local')
             restart();
             // try {clearInterval(intervalTimeSleep);} catch (e) {}
         }
 
-     }, 290000);
+    }, 290000);
 }
 //for ttsh only
+
+function IntervalDesktopScreenShot() {
+    fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+        var readjsondata;
+        if (data != '') {
+            readjsondata = JSON.parse(data);
+            if (readjsondata.isScreenShot == 1) {
+                try { clearInterval(intervalScreenShot); } catch (e) { }
+                console.log('SS true : INT : ' + readjsondata.SSInt)
+                var SSTime = readjsondata.SSInt;
+
+                intervalScreenShot = setInterval(function () {
+
+                    var currentDT = new Date().getDate() + '' + (new Date().getMonth() + 1) + '' + new Date().getFullYear() + '_h' + new Date().getHours() + 'm' + new Date().getMinutes() + 's' + new Date().getSeconds();
+                    var cnt = 0;
+
+                    screenshot.listDisplays().then((displays) => {
+                        for (var i = 0; i < displays.length; i++) {
+                            cnt++;
+                            var fileNameType = currentDT + '_D' + cnt + '.png';
+                            var ss_path = path.join(path.join(public, 'screenshot'), fileNameType);
+
+                            screenshot({ screen: displays[i].id, filename: ss_path })
+                                .catch((err) => {
+                                    console.log(err)
+                                    errlog('IntervalDesktopScreenShot :' + err)
+                                })
+                        }
+                    })
+
+                }, SSTime * 1000);
+            } else {
+                console.log("no SS clearing Int")
+                try { clearInterval(intervalScreenShot); } catch (e) { }
+            }
+        }
+    });
+
+
+}
 
 process.on('uncaughtException', function (err) {
     console.log(err);
@@ -1316,7 +1434,7 @@ server.listen(80, function () {
     CheckserverSchedule();
     openlink();
     defaultConfigMacAddr();
-
+    IntervalDesktopScreenShot();
 });
 
 

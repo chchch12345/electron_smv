@@ -176,6 +176,8 @@
                     <div style="margin-top:10px;">
                         <button style="margin-left: 7%;" onclick='ConfirmPopOFF()'>Display Off</button>
                         <button style="margin-left: 1%;" onclick='ConfirmPopRES()'>Restart</button>
+                        <button style="margin-left: 1%;" onclick='ConfirmPopSys()'>System</button>
+                        <button style="margin-left: 1%;" onclick='ConfirmPopSS()'>ScreenShot</button>
                     </div>
                 </div>
 
@@ -196,14 +198,15 @@
 
                 <div style="margin-top:30px;margin-bottom:30px;">
                     <label class="configtitle">
-                        LOG FILE DOWNLOAD</label>
+                        LOG FILE & OTHERS DOWNLOAD</label>
                     <!-- <button onclick='return FooSet()'>Set URL</button>
                          onclick="location.href='http://localhost/admin/download/success_log'"
                      onclick="location.href='http://localhost/admin/download/error_log'"
                     -->
                     <div style="margin-top:10px;">
-                        <button id='btnsslog' style="margin-left: 7%;">Success</button>
-                        <button id='btneelog' style="margin-left: 1%;">Error</button>
+                        <button id='btnsslog' style="margin-left: 7%;">Success.txt</button>
+                        <button id='btneelog' style="margin-left: 1%;">Error.txt</button>
+                        <button id='btnss' style="margin-left: 1%;">ScreenShot.zip</button>
                     </div>
                 </div>
             </div>
@@ -248,6 +251,49 @@
         <button style="border: 1px solid grey;margin-right: 10;float: right;"
             onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
         <!-- <div style="width:20%;margin-top:1%" class="column"><span onclick="this.parentElement.parentElement.parentElement.style.display='none';" class="closebtn">&times;</span></div> -->
+    </div>
+</div>
+
+<div id='popSystemControl' style="display:none;height: 165px;width: 300px;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:100%;height: 115px;" class="column">
+
+            <div style="font-weight: bold;font-family: sans-serif;">Volume
+                (<span id="txtvol"></span>)
+                <input id="InpVol" type="range" min="0" max="100" step="1" style="float: right;width: 130px; " onchange="updateTxtvol(this.value)" ></input>
+            </div>
+            
+            <div style="font-weight: bold;font-family: sans-serif;margin-top: 15%;">Brightness 
+                (<span id="txtbrig"></span>)
+                <input id="InpBrig" type="range" min="0" max="10" step="1" style="float: right;width: 130px; " onchange="updateTxtbrig(this.value)" ></input>
+           </div>
+
+        </div>
+        <button style="border: 1px solid grey; float: right;" onclick="confirm_system(this)">OK</button>
+        <button style="border: 1px solid grey;margin-right: 10;float: right;"
+            onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
+    </div>
+</div>
+
+<div id='popScreenShotControl' style="display:none;height: 165px;width: 300px;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:100%;height: 115px;" class="column">
+
+            <div style="font-weight: bold;font-family: sans-serif;">Screenshot
+                <select id="ddlSS" onchange="dllSSonchange()" style="display: inline;width: auto;cursor: pointer; margin-left: 8%;">
+                    <option value="1">ON</option>
+                    <option value="0">OFF</option>
+                </select>
+            </div>
+
+            <div id="SSIntDiv" style="display:none;font-weight: bold;font-family: sans-serif;">Interval (Second)
+                <input id="SSIntTxt" type='number' min="30" max="3600" style="font-size: large;border-radius: 10%;margin: 5%;"></input>
+            </div>
+
+        </div>
+        <button style="border: 1px solid grey; float: right;" onclick="confirm_screenshot(this)">OK</button>
+        <button style="border: 1px solid grey;margin-right: 10;float: right;"
+            onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
     </div>
 </div>
 <!-- pop out -->
