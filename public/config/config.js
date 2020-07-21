@@ -40,8 +40,8 @@ function confirm_system(el) {
 
     // console.log(document.getElementById("InpVol").value)
     // console.log(document.getElementById("InpBrig").value)
-    
-    const data = { volume: document.getElementById("InpVol").value, brightness: document.getElementById("InpBrig").value};
+
+    const data = { volume: document.getElementById("InpVol").value, brightness: document.getElementById("InpBrig").value };
     const options = {
         method: 'POST',
         headers: {
@@ -49,7 +49,7 @@ function confirm_system(el) {
         },
         body: JSON.stringify(data)
     };
-    fetch('/SetVolB', options).then(function (data) {});
+    fetch('/SetVolB', options).then(function (data) { });
 
     return true;
 }
@@ -59,12 +59,10 @@ function confirm_screenshot(el) {
 
     console.log(document.getElementById("ddlSS").value)
 
-    if(Number(document.getElementById("SSIntTxt").value)<30)
-    {
+    if (Number(document.getElementById("SSIntTxt").value) < 30) {
         document.getElementById("SSIntTxt").value = 30
     }
-    if(Number(document.getElementById("SSIntTxt").value)>3600)
-    {
+    if (Number(document.getElementById("SSIntTxt").value) > 3600) {
         document.getElementById("SSIntTxt").value = 3600
     }
     console.log(document.getElementById("SSIntTxt").value)
@@ -80,12 +78,33 @@ function confirm_screenshot(el) {
     })
         .then(function (data) {
             console.log(data)
-            FooSet(data.serIP, data.serIPcus,  data.iden , data.isSerdefault , data.isSchdefault,  data.isttsh , document.getElementById("ddlSS").value , document.getElementById("SSIntTxt").value );
-            fetch('/updateSS', options).then(function (response) {})
-        })  
+            FooSet(data.serIP, data.serIPcus, data.iden, data.isSerdefault, data.isSchdefault, data.isttsh, document.getElementById("ddlSS").value, document.getElementById("SSIntTxt").value, data.isSignage);
+            fetch('/updateSS', options).then(function (response) { })
+        })
 }
 
-function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh , SS , SSvalue) {
+function confirm_signage(el) {
+    el.parentNode.parentNode.style.display = 'none';
+
+    console.log(document.getElementById("ddlSign").value)
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    fetch('/fetchdata', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            console.log(data)
+            FooSet(data.serIP, data.serIPcus, data.iden, data.isSerdefault, data.isSchdefault, data.isttsh, data.isScreenShot, data.SSInt, document.getElementById("ddlSign").value);
+            fetch('/updateSignage', options).then(function (response) { })
+        })
+}
+
+function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag, ttsh, SS, SSvalue, Signage) {
     console.log(txtiden.value)
     const iden = IDENTITY;
     const serIP = IP;
@@ -95,7 +114,10 @@ function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh , SS , SSvalue) {
     const isttsh = ttsh;
     const isScreenShot = SS;
     const SSInt = SSvalue;
-    const data = { iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh , isScreenShot: isScreenShot , SSInt: SSInt };
+    const isSignage = Signage;
+    var isstartup = '1';
+    if (document.getElementById("hdnStartup").value == 1) { isstartup = '1'; } else { isstartup = '2'; }
+    const data = { startup: isstartup, iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault, isttsh: isttsh, isScreenShot: isScreenShot, SSInt: SSInt, isSignage: isSignage };
     const options = {
         method: 'POST',
         headers: {
@@ -124,6 +146,7 @@ function FooSet(IP, IPcus, IDENTITY, Flag, SchFlag , ttsh , SS , SSvalue) {
             }
         })
 
+    saveXY();
 
     return true;
 }
@@ -204,6 +227,19 @@ function Setdefault() {
                     }
                 }
 
+                if (data.startup == '1') {
+                    document.getElementById("hdnStartup").value = 1;
+                    document.getElementById("StartupSection1").style.display = "block";
+                    document.getElementById("StartupSection2").style.display = "none"
+                    document.getElementById("rdbStartup1").checked = true
+                } else {
+                    document.getElementById("hdnStartup").value = 2;
+                    document.getElementById("StartupSection1").style.display = "none";
+                    document.getElementById("StartupSection2").style.display = "block"
+                    document.getElementById("rdbStartup2").checked = true
+                }
+
+
                 if (data.isSerdefault == '1') {
                     document.getElementById("ddlprotocoldef").value = hdnDIP.value;
                     // document.getElementById("txtserurlcustom").style.display = "none";
@@ -283,19 +319,27 @@ function Setdefault() {
     })
         .then(function (data) {
             //console.log(data.length)
-            if(data.length >0){
+            if (data.length > 0) {
                 document.getElementById("showExtend").style.display = "block";
-                document.getElementById("showttsh2").style.display = "block";
-                document.getElementById("showttsh1").style.display = "none";
-                
-            }else{
-                document.getElementById("showExtend").style.display = "none";
-                document.getElementById("showttsh1").style.display = "block";
-                document.getElementById("showttsh2").style.display = "none";
+
+            } else {
+                document.getElementById("showExtend").style.display = "none"
 
             }
         })
 
+    fetch('/getEVCOLwhlt', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            console.log(data.docs[0])
+            if (data.docs.length > 0) {
+                document.getElementById("OverlayW").value = data.docs[0].w
+                document.getElementById("OverlayH").value = data.docs[0].h
+                document.getElementById("OverlayL").value = data.docs[0].l
+                document.getElementById("OverlayT").value = data.docs[0].t
+            }
+        })
 
     return true;
 };
@@ -322,28 +366,28 @@ function serConSave() {
             var schetype = document.querySelector('input[name="cake"]:checked').value
             if (document.querySelector('input[name="drone"]:checked').value == 1) {
                 if (txtserurl.value == '') {
-                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                    FooSet(txtserurl.value, data.serIPcus, txtiden.value, '1', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     hdnDIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocoldef").value == 'nots') {
                         hdnDIP.value = 'nots';
-                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                        FooSet('http://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     } else {
                         hdnDIP.value = 'gots';
-                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                        FooSet('https://' + txtserurl.value, data.serIPcus, txtiden.value, '1', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     }
                 }
             } else {
                 if (txtserurlcustom.value == '') {
-                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                    FooSet(data.serIP, txtserurlcustom.value, txtiden.value, '0', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     hdnCIP.value = 'nots';
                 } else {
                     if (document.getElementById("ddlprotocolcus").value == 'nots') {
                         hdnCIP.value = 'nots';
-                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                        FooSet(data.serIP, 'http://' + txtserurlcustom.value, txtiden.value, '0', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     } else {
                         hdnCIP.value = 'gots';
-                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype , data.isttsh , data.isScreenShot  , data.SSInt);
+                        FooSet(data.serIP, 'https://' + txtserurlcustom.value, txtiden.value, '0', schetype, data.isttsh, data.isScreenShot, data.SSInt, data.isSignage);
                     }
                 }
             }
@@ -402,6 +446,13 @@ function Gottsh() {
 }
 
 
+function GoFU() {
+    window.location.href = '../fileupload';
+
+    return true;
+}
+
+
 function ConfirmPopOFF() {
     document.getElementById("popmsgqueryoff").className = "alertConfirm";
     document.getElementById("popmsgqueryoff").style.display = "block";
@@ -428,8 +479,8 @@ function ConfirmPopSys() {
             //console.log(data)
             document.getElementById("InpVol").value = data.v
             document.getElementById("txtvol").textContent = data.v
-            document.getElementById("InpBrig").value = data.b*10
-            document.getElementById("txtbrig").textContent = data.b*10
+            document.getElementById("InpBrig").value = data.b * 10
+            document.getElementById("txtbrig").textContent = data.b * 10
 
             document.getElementById("popSystemControl").className = "alertConfirm2";
             document.getElementById("popSystemControl").style.display = "block";
@@ -437,11 +488,11 @@ function ConfirmPopSys() {
 }
 
 function updateTxtvol(v) {
-    document.getElementById("txtvol").textContent = v;    
+    document.getElementById("txtvol").textContent = v;
 }
 
 function updateTxtbrig(v) {
-    document.getElementById("txtbrig").textContent = v;    
+    document.getElementById("txtbrig").textContent = v;
 }
 
 function ConfirmPopSS() {
@@ -466,11 +517,10 @@ function ConfirmPopSS() {
 
                 document.getElementById("popScreenShotControl").className = "alertConfirm2";
                 document.getElementById("popScreenShotControl").style.display = "block";
-            
-                if(document.getElementById("ddlSS").value == 1)
-                {
+
+                if (document.getElementById("ddlSS").value == 1) {
                     document.getElementById("SSIntDiv").style.display = "block";
-                }else{
+                } else {
                     document.getElementById("SSIntDiv").style.display = "none";
                 }
             }
@@ -479,12 +529,102 @@ function ConfirmPopSS() {
 }
 
 function dllSSonchange() {
-    if(document.getElementById("ddlSS").value == 1)
-    {
+    if (document.getElementById("ddlSS").value == 1) {
         document.getElementById("SSIntDiv").style.display = "block";
-    }else{
+    } else {
         document.getElementById("SSIntDiv").style.display = "none";
     }
+}
+
+function ConfirmPopSign() {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    fetch('/fetchdata', options).then(function (response) {
+        return response.json()
+    })
+        .then(function (data) {
+            console.log(data)
+            if (data.empty) {
+                isemptyfile = 1;
+            } else {
+
+                document.getElementById("ddlSign").value = data.isSignage
+
+                document.getElementById("popSignageControl").className = "alertConfirm";
+                document.getElementById("popSignageControl").style.display = "block";
+
+            }
+        })
+    return true;
+}
+
+function runprogram() {
+    console.log(txtProgram.value)
+
+
+    const data = { startProg: txtProgram.value };
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    };
+
+    fetch('/startProg', options).then(function (response) {
+        return response.json()
+    }).then(function (data) {
+
+    })
+    return true;
+}
+
+function StarupOption(drone2) {
+    console.log(drone2.value);
+    if (drone2.value == 1) {
+        document.getElementById("hdnStartup").value = 1;
+        document.getElementById("StartupSection1").style.display = "block";
+        document.getElementById("StartupSection2").style.display = "none"
+    }
+    else {
+        document.getElementById("hdnStartup").value = 2;
+        document.getElementById("StartupSection1").style.display = "none";
+        document.getElementById("StartupSection2").style.display = "block";
+    }
+}
+
+function saveXY() {
+    console.log(document.getElementById("OverlayW").value)
+    console.log(document.getElementById("OverlayH").value)
+    console.log(document.getElementById("OverlayL").value)
+    console.log(document.getElementById("OverlayT").value)
+
+    const data = {
+        _id: 1,
+        w: document.getElementById("OverlayW").value,
+        h: document.getElementById("OverlayH").value,
+        l: document.getElementById("OverlayL").value,
+        t: document.getElementById("OverlayT").value,
+    };
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    };
+
+    fetch('/saveEVCOLwhlt', options).then(function (response) {
+        return response.json()
+    }).then(function (data) {
+
+    })
+    return true;
 }
 
 

@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, BrowserView } = require('electron')
 const electron = require('electron')
 const path = require('path')
 var express = require('express');
@@ -10,7 +10,7 @@ var fs = require('fs');
 const socketIo = require("socket.io");
 var cors = require('cors')
 var public = path.join(__dirname, 'public');
-var upload = require("express-fileupload");
+var uploadzip = require("express-fileupload");
 var Datastore = require('nedb')
 //'C:/SMV_venue_client/schedules.db'
 const db = new Datastore({ filename: public + '/schedules.db', autoload: true });
@@ -27,6 +27,24 @@ const os = require('os');
 const desktopDir = path.join(os.homedir(), 'Desktop/elec_pic');
 var intervalScreenShot;
 const zip = require('express-easy-zip');
+var multer = require('multer');
+const parser = require('simple-excel-to-json')
+const db4Excel = new Datastore({ filename: public + '/UploadData.db', autoload: true });
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+
+var upload = multer({}).single('filename');
+const dbExternalXY = new Datastore({ filename: public + '/ExternalVideoSource.db', autoload: true });
+
+// var storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, './uploads/'); // Absolute path. Folder must exist, will not be created for you.
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, Date.now());
+//     }
+//   })
+
+//   var upload = multer({ storage: storage });
 
 //W
 var app3 = express();
@@ -40,6 +58,49 @@ if (handleSquirrelEvent(app)) {
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+
+// let testWindow
+
+// function createtestWindow() {
+//     // Create the browser window.
+//     testWindow = new BrowserWindow({
+//         width: 800,
+//         height: 300,
+//         x: 100,
+//         y:100,
+//         minimizable: false,
+//         maximizable:false,
+//         resizable:false,
+//         closable:false,
+//         movable:false,
+//         // focusable:false,
+//         titleBarStyle: 'hidden',
+//         // alwaysOnTop:true,
+//         title: '',
+//         // kiosk:true,
+//         skipTaskbar :false,
+//         frame:false,
+//         webPreferences: {
+//             preload: path.join(__dirname, 'preload.js')
+//         }
+//     })
+
+//     testWindow.setMenuBarVisibility(false)
+//     testWindow.loadURL('https://en.wikipedia.org/wiki/Main_Page')
+//     // testWindow.hide();
+
+//     testWindow.on('closed', function () {
+//         testWindow = null
+//     })
+
+//     testWindow.once('ready-to-show', () => {
+//         win.hide();
+//     })
+// }
+
+// app.on('ready', createtestWindow)
+
+
 let mainWindow
 
 function createWindow() {
@@ -53,9 +114,12 @@ function createWindow() {
         fullscreen: true
     })
     mainWindow.setMenuBarVisibility(false)
+
+    // mainWindow.setOverlayIcon(path.join(public, 'icon/exit.png') , '325235623523')
+    // mainWindow.setThumbarButtons([{ icon: path.join(public, 'icon/exit.png'), tooltip:'4356346346', flags:'enabled' }])
     // and load the index.html of the app.
     //   mainWindow.loadFile('index.html')
-    mainWindow.loadURL('http://localhost/admin/')
+    //mainWindow.loadURL('http://localhost/admin/')
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
 
@@ -64,7 +128,13 @@ function createWindow() {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
+        
+        // killffPlay();
         mainWindow = null
+    })
+
+    mainWindow.once('ready-to-show', () => {
+        win.show()
     })
 }
 
@@ -75,10 +145,16 @@ app.on('ready', createWindow)
 // app.on('ready', createWindow2)
 
 //Extend Monitor uncomment below
-app.on('ready', () => {
+var createWindowmulti
+
+// app.on('ready', () => {
+
+// })
+function Windowmulti() {
     let displays = electron.screen.getAllDisplays()
     //console.log(displays);
     let externalDisplay = [];
+
     // let picurl = [];
 
     // picurl = ['http://hdwpro.com/wp-content/uploads/2016/03/Fantastic-Full-HD-Wallpaper.jpg',
@@ -92,7 +168,96 @@ app.on('ready', () => {
         Object.keys(displays[key]).forEach(function (key2) {
             if (key2 == 'bounds') {
                 if (displays[key][key2].x !== 0 || displays[key][key2].y !== 0) {
-                    externalDisplay.push(displays[key][key2]);
+                    externalDisplay.push({ id: displays[key].id, d: displays[key][key2] });
+                } else { }
+            }
+        });
+    });
+
+    //for testing
+    // var testobjectarr = [{ id:2779098405, d: { height: 864, width: 1537, x: 1366, y: 0 } }
+    //     , { id:7279098405, d: { height: 864, width: 1537, x: 2732, y: 10 } }
+    //     , { id:4779098405, d: { height: 864, width: 1537, x: 4098, y: 20 } }
+    //     , { id:3779098405, d: { height: 864, width: 1537, x: 5464, y: 30 } }
+    //     , { id:1759098405, d: { height: 864, width: 1537, x: 6830, y: 40 } }
+    //     , { id:1729098405, d: { height: 864, width: 1537, x: -1366, y: -30 } }
+    //     , { id:2739098405, d: { height: 864, width: 1537, x: -27325, y: -60345 } }
+    // ]
+    //for testing
+
+    var sorteddisplays = externalDisplay.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+    //console.log(externalDisplay)
+    dbExt.find({}, function (err, docs) {
+        for (var i in sorteddisplays) {
+
+            try {
+                createWindowmulti = new BrowserWindow({
+                    x: sorteddisplays[i].d.x,
+                    y: sorteddisplays[i].d.y,
+                    fullscreen: true
+                })
+
+                // let view = new BrowserView()
+                // createWindowmulti.setBrowserView(view)
+                // view.setBounds({ x: 0, y: 0, width: 300, height: 300 })
+                // var webid = Number(i) + 1;
+                // view.webContents.loadURL('http://localhost/admin/webview/'+webid)
+
+                // var tempid = "x" + JSON.stringify(externalDisplay[i].x).replace("-", "n") + "y" + JSON.stringify(externalDisplay[i].y).replace("-", "n");
+                var tempid = JSON.stringify(sorteddisplays[i].id)
+
+                createWindowmulti.setMenuBarVisibility(false)
+                if (docs.length > 0) {
+                    // console.log(docs[i])     
+                    // if(docs[i].url != 'value'){
+                    //     createWindowmulti.loadURL(docs[i].url)
+                    // }
+                    // else{
+                    //     createWindowmulti.loadURL('http://')
+                    // }
+                    Object.keys(docs).forEach(function (key) {
+                        var tdid
+                        var turl
+                        Object.keys(docs[key]).forEach(function (key2) {
+                            if (key2 == 'did') { tdid = docs[key][key2]; }
+                            if (key2 == 'url') { turl = docs[key][key2]; }
+                        })
+                        if (sorteddisplays[i].id == tdid) {
+                            // if (turl == '') { turl = 'http://'; }
+                            // createWindowmulti.loadURL(turl)
+                            if (turl != 'value') {
+                                createWindowmulti.loadURL(turl)
+                            }
+                            else {
+                                createWindowmulti.loadURL('http://')
+                            }
+                        }
+                    });
+
+                } else {
+                    createWindowmulti.loadURL('http://')
+                }
+
+            } catch (e) {
+
+            }
+
+
+
+        }
+    });
+}
+app.on('ready', Windowmulti)
+
+function restoreWindowmulti() {
+    let displays = electron.screen.getAllDisplays()
+    let externalDisplay = [];
+
+    Object.keys(displays).forEach(function (key) {
+        Object.keys(displays[key]).forEach(function (key2) {
+            if (key2 == 'bounds') {
+                if (displays[key][key2].x !== 0 || displays[key][key2].y !== 0) {
+                    externalDisplay.push({ id: displays[key].id, d: displays[key][key2] });
                 } else { }
             }
         });
@@ -100,13 +265,7 @@ app.on('ready', () => {
     //console.log(externalDisplay.length)
     dbExt.find({}, function (err, docs) {
         for (var i in externalDisplay) {
-
-            let createWindowmulti = new BrowserWindow({
-                x: externalDisplay[i].x,
-                y: externalDisplay[i].y,
-                fullscreen: true
-            })
-            var tempid = "x" + JSON.stringify(externalDisplay[i].x).replace("-", "n") + "y" + JSON.stringify(externalDisplay[i].y).replace("-", "n");
+            var tempid = JSON.stringify(externalDisplay[i].id)
 
             createWindowmulti.setMenuBarVisibility(false)
             Object.keys(docs).forEach(function (key) {
@@ -118,13 +277,13 @@ app.on('ready', () => {
                 })
                 if (tempid == id) {
                     if (turl == '') { turl = 'http://'; }
+                    createWindowmulti.setBounds({ x: externalDisplay[i].d.x, y: externalDisplay[i].d.y })
                     createWindowmulti.loadURL(turl)
                 }
             });
-
         }
     });
-})
+}
 //Extend Monitor uncomment above
 
 // Quit when all windows are closed.
@@ -139,6 +298,7 @@ app.on('activate', function () {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow()
 })
+
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -207,8 +367,9 @@ function handleSquirrelEvent(application) {
 };
 
 app2.use(cors())
-app2.use(upload())
+app2.use(uploadzip())
 app2.use(zip());
+
 
 app2.use('/admin', express.static(path.join(__dirname, 'public')));
 app2.use(express.json({ limit: '1mb' }));
@@ -228,6 +389,20 @@ app2.get('/admin/extend', function (req, res) {
 
 app2.get('/admin/ttsh', function (req, res) {
     res.sendFile(path.join(public, '/ttsh/ttsh.html'));
+});
+
+app2.get('/admin/fileupload', function (req, res) {
+    res.sendFile(path.join(public, '/fileupload/fileupload.html'));
+});
+
+app2.get('/admin/webview/:webid', function (req, res) {
+    // console.log(req.params.webid)
+    // res.sendFile(path.join(public, '/webview/webview.html/'));
+    res.send(`
+      <div style="background: black;width: 270px;height:280px;text-align: center;align-items: center;display: flex;">
+      <p style="margin:auto;background: black;color: white;font-size:15em;">`+ req.params.webid + `</p>
+      </div>
+      `)
 });
 
 app2.get('/admin/screen_off.php', function (req, res) {
@@ -391,7 +566,7 @@ io.on('connection', (socket) => {
     });
 })
 
-app2.post('/upload', function (req, res) {
+app2.post('/uploadzip', function (req, res) {
     if (req.files) {
         console.log(req.files.filename); // the uploaded file object
 
@@ -415,6 +590,131 @@ app2.post('/upload', function (req, res) {
 
     }
 });
+
+app2.post('/admin/fileupload/uploadexcel', function (req, res) {
+    //APPLE
+    var exceltojson;
+    var check1 = false, check2 = false, isinserted = false;
+
+    upload(req, res, function (err) {
+        if (err) {
+            res.json({ error_code: 1, err_desc: err });
+            return;
+        }
+        //console.log(req.files.filename)
+        /** Multer gives us file info in req.file object */
+        if (!req.files.filename) {
+            res.json({ error_code: 1, err_desc: "No file passed" });
+            return;
+        }
+
+        var file = req.files.filename,
+            fn = path.join(path.join(public, 'uploads'), file.name)
+        file.mv(fn, function (err) {
+            if (err) {
+                console.log(err)
+                return;
+            }
+            else {
+                //res.end("Success upload")
+                console.log('success')
+                console.log(fn)
+                try {
+                    var customData = parser.parseXls2Json(fn, { isNested: true });
+                    Object.keys(customData[0]).forEach(function (key) {
+                        Object.keys(customData[0][key]).forEach(function (key2) {
+                            if (key2 == 'url') {
+                                check1 = true;
+                            }
+                            if (key2 == 'description') {
+
+                                check2 = true;
+                            }
+                        })
+                        // console.log(check1 + check2)
+                        if (check1 && check2) {
+                            db4Excel.insert([customData[0][key]], function (err, newDocs) {
+                                if (err) { console.log(err) }
+                                isinserted = true;
+                            });
+                        } else {
+                            isinserted = false;
+                        }
+
+                    });
+                    if (isinserted) {
+                        db4Excel.find({}, {}, function (err, docs) {
+                            console.log(docs.length)
+                            if (docs.length >= customData[0].length && docs.length != 0) {
+                                console.log("delete")
+                                var dir = path.join(public, 'uploads');
+                                fs.readdir(dir, (err, files) => {
+                                    if (err) throw err;
+
+                                    console.log(files)
+                                    for (const file of files) {
+                                        fs.unlink(path.join(dir, file), err => {
+                                            if (err) throw err;
+                                        });
+                                    }
+                                    res.redirect('/admin/fileupload');
+                                })
+                            }
+                        })
+                    }
+                    else {
+                        var dir = path.join(public, 'uploads');
+                        fs.readdir(dir, (err, files) => {
+                            if (err) throw err;
+
+                            console.log(files)
+                            for (const file of files) {
+                                fs.unlink(path.join(dir, file), err => {
+                                    if (err) throw err;
+                                });
+                            }
+                            res.redirect('/admin/fileupload');
+                        })
+                    }
+                    // console.log(customData[0].length);
+                    // console.log(customData);
+                } catch (e) {
+                    console.log(e)
+                    res.json({ error_code: 1, err_desc: "Corupted excel file" });
+                }
+            }
+        });
+
+    })
+});
+
+app2.post('/Getdb4Excel', (req, res) => {
+    db4Excel.find({}, {}, function (err, docs) {
+        if (docs.length > 0) {
+            res.json({
+                docs
+            });
+        } else {
+            res.json({
+                docs: []
+            });
+        }
+
+        res.end();
+    });
+})
+
+app2.post('/deleteAlldb4Excel', (req, res) => {
+    db4Excel.remove({}, { multi: true }, function (err, numRemoved) {
+        if (err) { console.log(err) }
+        console.log(numRemoved)
+        db4Excel.loadDatabase();
+        res.json({
+            delN: numRemoved
+        });
+        res.end();
+    });
+})
 
 app2.post('/overritePatchfile', function (req, res) {
     var child_process = require('child_process');
@@ -473,6 +773,10 @@ app2.post('/GetVolB', (request, response) => {
     })()
 })
 
+app2.post('/updateSignage', (request, response) => {
+    openlink();
+})
+
 app2.post('/updateSS', (request, response) => {
     IntervalDesktopScreenShot();
 })
@@ -505,6 +809,61 @@ app2.post('/fetchdata', (request, response) => {
             response.end();
         }
         console.log(data)
+    });
+})
+
+app2.post('/startProg', (request, response) => {
+
+    console.log(request.body.startProg)
+    const { exec } = require("child_process");
+
+    //click s to stop
+    // "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe" -I dummy --dummy-quiet C:\Users\cheechiew.cheng\Videos\Captures\mz.mp4 -f --no-fullscreen  --no-embedded-video --no-autoscale --width=1920 --height=1080 --video-x=1 --video-y=1 --no-video-deco
+    // '"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe" -I dummy --dummy-quiet C:\\Users\\cheechiew.cheng\\Videos\\Captures\\mz.mp4 -f --no-fullscreen --no-embedded-video --no-autoscale --width=1920 --height=1080 --video-x=1 --video-y=1 --no-video-deco'
+    exec(request.body.startProg, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            response.status(500).send()
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            response.status(200).send()
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+    });
+
+})
+
+app2.post('/saveEVCOLwhlt', (request, response) => {
+    //here
+    console.log(request.body)
+    dbExternalXY.remove({}, { multi: true }, function (err, numRemoved) {
+        if (err) { console.log(err) }
+        dbExternalXY.loadDatabase();
+        dbExternalXY.insert(request.body, function (err1, newDocs) {
+            if (err1) { console.log(err1); }
+            response.end();
+        });
+    });
+
+
+})
+
+app2.post('/getEVCOLwhlt', (request, response) => {
+    dbExternalXY.find({}, {}, function (err, docs) {
+        if (docs.length > 0) {
+            response.json({
+                docs
+            });
+        } else {
+            response.json({
+                docs: []
+            });
+        }
+
+        response.end();
     });
 })
 
@@ -566,6 +925,60 @@ app2.post('/deleteschedule', (request, response) => {
     });
 })
 
+app2.post('/ShowExtendDisplayID', (request, response) => {
+    // var historyARR = [];
+    (async () => {
+        var cnt = electron.BrowserWindow.getAllWindows().length; // - 1
+        await electron.BrowserWindow.getAllWindows().reverse().forEach(window => {
+            if (window.id != 1) {
+                let view = new BrowserView()
+                window.setBrowserView(view);
+                view.setBounds({ x: 0, y: 0, width: 300, height: 300 })
+                view.webContents.loadURL('http://localhost/admin/webview/' + cnt)
+
+                cnt--;
+
+                //historyARR.push(window.getBrowserView().webContents.history.toString().replace(/\s/g, ''))
+                // .webContents.insertCSS('html{display: block}');
+            }
+        })
+        // await electron.BrowserWindow.getAllWindows().reverse().forEach(window => {
+        //     if(window.id != 1)
+        //     {
+        //         // window.close()
+        //         window.removeBrowserView(window.getBrowserView());
+        //         // .webContents.insertCSS('html{display: block}');
+        //     }
+        // })
+        // console.log(historyARR)
+        // var cnt = 0;
+        await setTimeout(function () {
+            electron.BrowserWindow.getAllWindows().reverse().forEach(window => {
+                if (window.id != 1) {
+                    window.removeBrowserView(window.getBrowserView());
+                }
+            })
+        }, 10000);
+    })();
+
+    response.end();
+
+})
+
+app2.post('/UpdateExtendDisplay', (request, response) => {
+    (async () => {
+        await electron.BrowserWindow.getAllWindows().reverse().forEach(window => {
+            if (window.id != 1) {
+                window.close()
+            }
+        })
+        await Windowmulti();
+    })();
+
+    response.end();
+})
+
+
 app2.post('/GetCurrentExtend', (request, response) => {
 
     let displays = electron.screen.getAllDisplays()
@@ -575,23 +988,22 @@ app2.post('/GetCurrentExtend', (request, response) => {
         Object.keys(displays[key]).forEach(function (key2) {
             if (key2 == 'bounds') {
                 if (displays[key][key2].x !== 0 || displays[key][key2].y !== 0) {
-                    externalDisplay.push(displays[key][key2]);
+                    externalDisplay.push({ id: displays[key].id, d: displays[key][key2] });
                 } else { }
             }
         });
     });
 
     //for testing
-    // var testobjectarr = [{ height: 864, width: 1537, x: 1366, y: 0 }
-    //     , { height: 864, width: 1537, x: 2732, y: 10 }
-    //     , { height: 864, width: 1537, x: 4098, y: 20 }
-    //     , { height: 864, width: 1537, x: 5464, y: 30 }
-    //     , { height: 864, width: 1537, x: 6830, y: 40 }
-    //     , { height: 864, width: 1537, x: -1366, y: -30 }
-    //     , { height: 864, width: 1537, x: -27325, y: -60345 }
+    // var testobjectarr = [{ id:2779098405, d: { height: 864, width: 1537, x: 1366, y: 0 } }
+    //     , { id:7279098405, d: { height: 864, width: 1537, x: 2732, y: 10 } }
+    //     , { id:4779098405, d: { height: 864, width: 1537, x: 4098, y: 20 } }
+    //     , { id:3779098405, d: { height: 864, width: 1537, x: 5464, y: 30 } }
+    //     , { id:1759098405, d: { height: 864, width: 1537, x: 6830, y: 40 } }
+    //     , { id:1729098405, d: { height: 864, width: 1537, x: -1366, y: -30 } }
+    //     , { id:2739098405, d: { height: 864, width: 1537, x: -27325, y: -60345 } }
     // ]
     //for testing
-
     response.json(externalDisplay);
     response.end();
 })
@@ -604,27 +1016,26 @@ app2.post('/getDBExtend', (request, response) => {
 })
 
 app2.post('/saveExtend', (request, response) => {
-    //console.log(request.body);
+
+    dbExt.remove({}, { multi: true }, function (err, numRemoved) {
+        if (err) { console.log(err) }
+        console.log(numRemoved)
+        db4Excel.loadDatabase();
+    });
+
+    var id = 1;
     Object.keys(request.body).forEach(function (key) {
-        var id
+        var tdid
         var turl
         Object.keys(request.body[key]).forEach(function (key2) {
-            if (key2 == '_id') { id = request.body[key][key2]; }
+            if (key2 == 'did') { tdid = request.body[key][key2]; }
             if (key2 == 'url') { turl = request.body[key][key2]; }
         })
 
-        dbExt.findOne({ _id: id }, function (err, doc) {
-            if (doc == null) {
-                //console.log("no record")
-                dbExt.insert([{ _id: id, url: turl }], function (err, newDocs) {
-                    if (err) { console.log(err) }
-                });
-            } else {
-                dbExt.update({ _id: id }, { $set: { url: turl } }, function (err, newDoc) {
-                    if (err) { console.log(err) }
-                });
-            }
+        dbExt.insert([{ _id: id, did: tdid, url: turl }], function (err, newDocs) {
+            if (err) { console.log(err) }
         });
+        id++;
 
     });
 
@@ -874,33 +1285,33 @@ function on() {
 
 var osW = 'windows';
 
-try {
-	var ostest = require('child_process').execSync('lsb_release -a');
-	if(ostest.includes("Ubuntu")) osW = 'ubuntu';
-} catch (ex) {}
+// try {
+//     var ostest = require('child_process').execSync('lsb_release -a');
+//     if (ostest.includes("Ubuntu")) osW = 'ubuntu';
+// } catch (ex) { }
 
 function restart() {
-    if(osW == 'windows') {
-    // scclog('restart() :Reboot successfully')
-    var spawn = require('child_process').spawn,
-        ls = spawn('cmd.exe', ['/C', "shutdown /r /f /t 0"]);
+    if (osW == 'windows') {
+        // scclog('restart() :Reboot successfully')
+        var spawn = require('child_process').spawn,
+            ls = spawn('cmd.exe', ['/C', "shutdown /r /f /t 0"]);
 
-    ls.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);
-    });
+        ls.stdout.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
 
-    ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
-    });
+        ls.stderr.on('data', function (data) {
+            console.log('stderr: ' + data);
+        });
 
-    ls.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
-        if (code === 0) { scclog('restart() :restart successfully') }
-    });
+        ls.on('exit', function (code) {
+            console.log('child process exited with code ' + code);
+            if (code === 0) { scclog('restart() :restart successfully') }
+        });
     }
     else if (osW == 'ubuntu') {
-		require('child_process').execSync('sudo reboot');
-	}
+        require('child_process').execSync('sudo reboot');
+    }
 }
 
 function servercheck() {
@@ -938,7 +1349,7 @@ function servercheck() {
                     if (list[key].ip_address == null) { isLanDC = 1 };
                     mac = list[key].mac_address.replace(/:/gi, '')
                 }
-                if (list[key].name.startsWith('Ethe')  || (osW == 'ubuntu' && list[key].name.startsWith('eth'))) { gotLAN = 1 }
+                if (list[key].name.startsWith('Ethe') || (osW == 'ubuntu' && list[key].name.startsWith('eth'))) { gotLAN = 1 }
                 if (list[key].name.startsWith('Wi-Fi')) { gotWIFI = 1 }
             })
             if (gotLAN == 0) { isLanDC = 1 }
@@ -952,7 +1363,11 @@ function servercheck() {
                 // console.log('timerstart')
                 scclog('servercheck : restart timerstart status: ' + 'GL:' + gotLAN + ',LID:' + isLanDC + ',GW:' + gotWIFI + ',WID:' + isWifiDC)
                 hdnisrestart = 1;
-                (async () => { await mainWindow.loadURL('http://localhost/admin/') })();
+                (async () => {
+                    try { mainWindow.show(); } catch (e) { }
+                    try { mainWindow.loadURL('http://localhost/admin/'); } catch (e) { }
+                    try { createWindowmulti.loadURL('http://localhost/admin/'); } catch (e) { }
+                })();
                 DisconTimeout10min = setTimeout(function () {
                     scclog('servercheck : restarting. reason no internet')
                     setTimeout(function () { restart(); }, 10000);
@@ -965,7 +1380,8 @@ function servercheck() {
                 hdnisrestart = 0;
                 clearTimeout(DisconTimeout10min);
                 (async () => {
-                    await openlink();
+                    try { await openlink(); } catch (e) { }
+                    try { await restoreWindowmulti(); } catch (e) { }
                 })();
             }
         })
@@ -997,7 +1413,12 @@ function openlink() {
 
         (async () => {//http://119.73.206.46:7890/Web/displaySignage.html#/init/b8aeed78f1cb
             // open(seturl);
-            await mainWindow.loadURL(seturl)
+            // await mainWindow.loadURL(seturl)
+            if (jsondata.isSignage == '1') {
+                try { mainWindow.show(); } catch (e) { }
+                mainWindow.loadURL(seturl)
+            } else { try { mainWindow.hide(); } catch (e) { } }
+
             //clearInterval(myInterval);
             // for win
             //if (seturl == 'http://localhost/admin') { } else { sendkeys.send('{f11}') }
@@ -1380,6 +1801,50 @@ function isTimeToSleep() {
     }, 290000);
 }
 //for ttsh only
+function SS2Server(imgARR, imgName) {
+    fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+        var readjsondata;
+        if (data != '') {
+            readjsondata = JSON.parse(data);
+
+            //http://119.73.206.46:7890/InterfaceAPI/STB/Heartbeat   
+
+            var SPath = readjsondata.serIP + '/InterfaceAPI/STB/Heartbeat'
+
+            var xhr = new XMLHttpRequest();
+            xhr.onloadend = function () {
+                // done
+            };
+            xhr.onerror = function (e) {
+                console.log(e)
+            };
+
+            xhr.open("POST", SPath, true);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+            var intARR = [];
+
+            for (var i = 0; i < imgName.length; i++) {
+                imgName[i] = 'MAC_' + readjsondata.iden + '_DT' + imgName[i];
+            }
+
+            imgARR.forEach(img => {
+                intARR.push(Array.from(Uint8Array.from(img)))
+            });
+
+            console.log(imgName)
+            // console.log(intARR)
+            //send the collected data as JSON .toString("hex")
+            xhr.send(JSON.stringify({
+                mac_address: readjsondata.iden, //b8aeed78f1cb readjsondata.iden 00E05C685471
+                filebytes: intARR,
+                filename: imgName
+            }));
+
+
+        }
+    })
+}
 
 function IntervalDesktopScreenShot() {
     fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
@@ -1397,17 +1862,23 @@ function IntervalDesktopScreenShot() {
                     var cnt = 0;
 
                     screenshot.listDisplays().then((displays) => {
+                        var imgNameArr = [];
                         for (var i = 0; i < displays.length; i++) {
                             cnt++;
                             var fileNameType = currentDT + '_D' + cnt + '.png';
                             var ss_path = path.join(path.join(public, 'screenshot'), fileNameType);
 
-                            screenshot({ screen: displays[i].id, filename: ss_path })
-                                .catch((err) => {
-                                    console.log(err)
-                                    errlog('IntervalDesktopScreenShot :' + err)
-                                })
+                            imgNameArr.push(fileNameType)
+
+                            // screenshot({ screen: displays[i].id, filename: ss_path })
+                            //     .catch((err) => {
+                            //         console.log(err)
+                            //         errlog('IntervalDesktopScreenShot :' + err)
+                            //     })
                         }
+                        screenshot.all().then((imgs) => {
+                            SS2Server(imgs, imgNameArr);
+                        })
                     })
 
                 }, SSTime * 1000);
@@ -1426,6 +1897,67 @@ process.on('uncaughtException', function (err) {
     errlog(err)
 });
 
+function killffPlay() {
+    const { exec } = require("child_process");
+
+    let data = 'taskkill /IM ffplay.exe'
+
+    exec(data, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            response.status(500).send()
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            response.status(200).send()
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+    });
+
+
+}
+// ffmpeg -list_devices true -f dshow -i dummy
+
+
+function StartupExternalVideoSource() {
+    dbExternalXY.find({}, {}, function (err, docs) {
+        if (docs.length > 0) {
+            // console.log(docs[0].X)
+
+            fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+                var readjsondata;
+                if (data != '') {
+                    readjsondata = JSON.parse(data);
+                    if (readjsondata.startup == '2') {
+                        const { exec } = require("child_process");
+
+                        // let data = 'ffplay -f dshow -rtbufsize 702000k -framerate 60 -x 700 -y 1080 -left 670 -top 0 -i video="USB Video":audio="@device_cm_{33D9A762-90C8-11D0-BD43-00A0C911CE86}\\wave_{6B25EFFC-EB1F-4827-A7CE-A6C5CA92EFA2}" -threads 3 -noborder'
+                        let data = 'ffplay -f dshow -rtbufsize 702000k -framerate 60 -x '+ docs[0].w +' -y '+ docs[0].h +' -left '+ docs[0].l + ' -top '+ docs[0].t +' -i video="USB Video":audio="Digital Audio Interface (2- USB Digital Audio)" -threads 3 -noborder -alwaysontop'
+
+                        exec(data, (error, stdout, stderr) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderr) {
+                                console.log(`stderr: ${stderr}`);
+                                // setTimeout((function() {
+                                //     return process.exit();
+                                // }), 5000);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                        });
+                    }
+                }
+            });
+        }
+    })
+}
+
+//npm start
 server.listen(80, function () {
     scclog('server.listen :Server has started successfully')
     servercheck();
@@ -1435,8 +1967,8 @@ server.listen(80, function () {
     openlink();
     defaultConfigMacAddr();
     IntervalDesktopScreenShot();
+    // StartupExternalVideoSource();
 });
-
 
 //W
 
@@ -1444,45 +1976,45 @@ var last_update = new Date();
 
 app3.all('/heartbeat', function (req, res) {
 
-fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
-    var readjsondata;
-    if (data != '') {
-        readjsondata = JSON.parse(data);
+    fs.readFile(path.join(__dirname, 'config.xml'), "utf8", function read(err, data) {
+        var readjsondata;
+        if (data != '') {
+            readjsondata = JSON.parse(data);
 
-        if(readjsondata.serIP != ''){
-            var hostN = readjsondata.serIP.split(':')[1].replace('//','')
-            var portN = readjsondata.serIP.split(':')[2]
+            if (readjsondata.serIP != '') {
+                var hostN = readjsondata.serIP.split(':')[1].replace('//', '')
+                var portN = readjsondata.serIP.split(':')[2]
 
-        const options = {
-            hostname: hostN,
-            port: portN,
-            path: '/InterfaceAPI/STB/Heartbeat?mac_address='  + readjsondata.iden,
-            method: 'GET'
-        }
-
-        const req = http.get(options, (res) => {
-
-            res.on('data', (d) => {
-                try {
-                    console.log(JSON.parse(d));
-
-                    last_update = new Date();
-                    console.log("Last update", last_update);
-
-                    response.end();
-                } catch (e) {
-                    // console.log(e)
+                const options = {
+                    hostname: hostN,
+                    port: portN,
+                    path: '/InterfaceAPI/STB/Heartbeat?mac_address=' + readjsondata.iden,
+                    method: 'GET'
                 }
-            })
-        })
 
-        req.on('error', (error) => {
-            //console.error(error)
-        })
+                const req = http.get(options, (res) => {
 
-        req.end();
+                    res.on('data', (d) => {
+                        try {
+                            console.log(JSON.parse(d));
+
+                            last_update = new Date();
+                            console.log("Last update", last_update);
+
+                            response.end();
+                        } catch (e) {
+                            // console.log(e)
+                        }
+                    })
+                })
+
+                req.on('error', (error) => {
+                    //console.error(error)
+                })
+
+                req.end();
+            }
         }
-      }
     });
     res.json({ "result": "ok" });
 

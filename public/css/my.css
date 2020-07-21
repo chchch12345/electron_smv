@@ -65,14 +65,14 @@ label.custom {
     pointer-events:auto;
     position: fixed;
     right: 150px;
-    top: 24%;
+    top: 38%;
     cursor: pointer;
     float: none;
     padding: 0px;
     margin: 0px;
 }
 
-.ttsh1 {
+.ttsh {
     /* width: 30px; */
     pointer-events:auto;
     position: fixed;
@@ -84,7 +84,7 @@ label.custom {
     margin: 0px;
 }
 
-.ttsh2 {
+.FU {
     /* width: 30px; */
     pointer-events:auto;
     position: fixed;
@@ -95,7 +95,6 @@ label.custom {
     padding: 0px;
     margin: 0px;
 }
-
 
 
 .Logincontent {

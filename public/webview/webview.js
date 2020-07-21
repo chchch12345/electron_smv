@@ -1,5 +1,5 @@
 
-function FooSet(startUp ,IP, IPcus, IDENTITY, Flag, SchFlag, ttsh, SS , SSvalue , Signage) {
+function FooSet(startUp, IP, IPcus, IDENTITY, Flag, SchFlag, ttsh, SS , SSvalue , Signage) {
     const iden = IDENTITY;
     const serIP = IP;
     const serIPcus = IPcus;
@@ -9,8 +9,8 @@ function FooSet(startUp ,IP, IPcus, IDENTITY, Flag, SchFlag, ttsh, SS , SSvalue 
     const isScreenShot = SS;
     const SSInt = SSvalue;
     const isSignage = Signage;
-    const istartup = startUp;
-    const data = {startup: istartup, iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh , isScreenShot: isScreenShot , SSInt: SSInt , isSignage: isSignage };
+    const isStartup = startUp;
+    const data = { startup: isStartup, iden: iden, serIP: serIP, serIPcus: serIPcus, isSerdefault: isSerdefault, isSchdefault: isSchdefault , isttsh: isttsh , isScreenShot: isScreenShot , SSInt: SSInt , isSignage: isSignage };
     const options = {
         method: 'POST',
         headers: {
@@ -56,13 +56,7 @@ function Setdefault() {
     })
         .then(function (data) {
             console.log(data)
-            if (data.empty) {
-                isemptyfile = 1;
-            } else {
-                console.log(data.isttsh)
-                document.getElementById("ddlfunctionality").value = data.isttsh
-
-            }
+            document.getElementById("webid").value = data.id
         })
     return true;
 };

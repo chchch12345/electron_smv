@@ -21,32 +21,38 @@
     <body onload="Setdefault()">
         <div class="content" style="max-width:900px;">
             <div style="margin: auto;" class="row">
-                <div style="width: 70%;" class="columnContent">
-                    <label class="configtitle">Unassign Displays</label>
+                <div style="width: 50%;" class="columnContent">
+                    <label class="configtitle">Windows Detected Displays</label>
                     <div style="margin-top: 10px; border: 1px solid silver;max-width: 700px;margin: auto;"> </div>
                 </div>
-                <div style="width: 20%;float:left;padding-left: 2%;">
+                <div style="width: 20%;display: flex;float:left;padding-left: 2%;">
                     <button onclick='return DRbtnClick()'>DETECT & REFRESH</button>
+                    <button style="margin-left: 10%;" onclick='return IDENbtnClick()'>IDENTIFY</button>
                 </div>
             </div>
             <div style="margin-top: 20px;max-width: 900px;" class="content">
-                    <div style="max-width: 900px;" id="MunAList"></div>
+                    <div style="max-width: 900px;overflow: hidden;height: 300px;overflow-y: auto;width: 80%;" id="MunAList"></div>
             </div>
 
             <div style="margin: auto;" class="row">
-                    <div style="width: 70%;" class="columnContent">
+                    <div style="width: 50%;" class="columnContent">
                         <label class="configtitle">Assigned Displays</label>
                         <div style="margin-top: 10px; border: 1px solid silver;max-width: 700px;margin: auto;"> </div>
                     </div>
-                    <div style="width: 20%;float:left;padding-left: 2%;">
+                    <div style="width: 20%;display: flex;float:left;padding-left: 2%;">
                          <button id='showSave' onclick='return SAbtnClick()'>SAVE & APPLY</button>
+                         <button id='showUpdate' style="margin-left: 10%;" onclick='return UDbtnClick()'>UPDATE DISPLAYS</button>
                     </div>
             </div>
 
-            <div style="margin-top: 20px;max-width: 900px;" class="content">
+            <!-- <div style="margin-top: 20px;max-width: 900px;" class="content">
                     <div style="max-width: 900px;">
                     <ul  id="MAList"></ul>
                     </div>
+            </div> -->
+
+            <div style="margin-top: 20px;max-width: 900px;" class="content">
+                <div style="max-width: 900px;overflow: hidden;height: 300px;overflow-y: auto;width: 80%;" id="UrlList"></div>
             </div>
             
 

@@ -16,9 +16,10 @@
     <div id="ContentPageTitle">
         <a onclick='return logout()' class="logout">Logout &nbsp;&nbsp;&nbsp;<span>&#10170;</span> </a>
         <a class="schedule" onclick='return Goshc()'>Schedule &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
-        <a id='showExtend' class="me" onclick='return Goext()'>Monitor Extend &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
-        <a id='showttsh1' class="ttsh1" onclick='return Gottsh()'>TTSH &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
-        <a id='showttsh2' class="ttsh2" onclick='return Gottsh()'>TTSH &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a class="ttsh" onclick='return Gottsh()'>TTSH &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a class="FU" onclick='return GoFU()'>File upload &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
+        <a id='showExtend' class="me" onclick='return Goext()'>Monitor Extend
+            &nbsp;&nbsp;&nbsp;<span>&#10170;</span></a>
         <!-- <img onclick='return logout()' class="logout" src="../icon/exit.png" /> -->
         <h1 style="text-align: center;">Configuration</h1>
     </div>
@@ -28,40 +29,58 @@
 <body onload="Setdefault()">
     <div id="ContentPage">
         <div class="content">
-            <div style="margin: auto;" class="row">
+
+            <div style="margin: auto; margin-top: 10px;" class="row">
                 <div style="width: 15%;" class="columnContent">
-                    <label class="configlabel">Server IP</label>
+                    <label class="configlabel">Startup</label>
                 </div>
-                <div style="width: 10%;" class="columnContent">
-                    <select id="ddlprotocoldef" style="width: auto;cursor: pointer; margin-left: 8%;">
-                        <option value="nots">http://</option>
-                        <option value="gots">https://</option>
-                    </select>
-                </div>
-                <div style="width: 50%;" class="columnContent">
-                    <input style="width:100%" type="text" id='txtserurl' />
-                    <!-- <input style="width:100%" type="text" id='txtserurlcustom' /> -->
+                <div style="width:60%; margin-top: 1%;" class="columnContent">
+                    <input style="border-color: white;" type="radio" id="rdbStartup1" onclick="StarupOption(this);"
+                        name="drone2" value="1">
+                    <label style="margin-top: -2%;" for="rdbStartup1">Venue 360</label>&nbsp;
+                    <input style="border-color: white;" type="radio" id="rdbStartup2" onclick="StarupOption(this);"
+                        name="drone2" value="0">
+                    <label style="margin-top: -2%;margin-left: 2%;" for="rdbStartup2">External Video Source</label>
                 </div>
                 <div style="width: 25%;float:left;padding-left: 2%;">
                     <button onclick='return serConSave()'>SAVE CONFIG</button>
                 </div>
             </div>
+            <div id='StartupSection1'>
+                <div style="margin: auto;" class="row">
+                    <div style="width: 15%;" class="columnContent">
+                        <label class="configlabel">Server IP</label>
+                    </div>
+                    <div style="width: 10%;" class="columnContent">
+                        <select id="ddlprotocoldef" style="width: auto;cursor: pointer; margin-left: 8%;">
+                            <option value="nots">http://</option>
+                            <option value="gots">https://</option>
+                        </select>
+                    </div>
+                    <div style="width: 50%;" class="columnContent">
+                        <input style="width:100%" type="text" id='txtserurl' />
+                        <!-- <input style="width:100%" type="text" id='txtserurlcustom' /> -->
+                    </div>
+                    <!-- <div style="width: 25%;float:left;padding-left: 2%;">
+                    <button onclick='return serConSave()'>SAVE CONFIG</button>
+                </div> -->
+                </div>
 
-            <div id='customIPdiv' style="margin: auto;" class="row">
-                <div style="width: 15%;" class="columnContent">
-                    <label class="configlabel">Custom IP</label>
+                <div id='customIPdiv' style="margin: auto;" class="row">
+                    <div style="width: 15%;" class="columnContent">
+                        <label class="configlabel">Custom IP</label>
+                    </div>
+                    <div style="width: 10%;" class="columnContent">
+                        <select id="ddlprotocolcus" style="width: auto;cursor: pointer; margin-left: 8%;">
+                            <option value="nots">http://</option>
+                            <option value="gots">https://</option>
+                        </select>
+                    </div>
+                    <div style="width: 50%;" class="columnContent">
+                        <input style="width:100%" type="text" id='txtserurlcustom' />
+                    </div>
                 </div>
-                <div style="width: 10%;" class="columnContent">
-                    <select id="ddlprotocolcus" style="width: auto;cursor: pointer; margin-left: 8%;">
-                        <option value="nots">http://</option>
-                        <option value="gots">https://</option>
-                    </select>
-                </div>
-                <div style="width: 50%;" class="columnContent">
-                    <input style="width:100%" type="text" id='txtserurlcustom' />
-                </div>
-            </div>
-            <div class="content">
+                <!-- <div class="content"> -->
                 <div style="margin: auto; margin-top: 10px;" class="row">
                     <div class="columnContent">
                         <label class="configlabel">Unique Identifier</label>
@@ -98,122 +117,170 @@
                         </select>
                     </div> -->
                 </div>
+            </div>
+
+            <div id='StartupSection2'>
+
+                <div style="margin: auto; margin-top: 10px;" class="row">
+                    <div style="width: 20%;" class="columnContent" >
+                        <label class="configlabel">Startup OV width</label>
+                    </div>
+                    <div style="width: 15%;" class="columnContent">
+                        <input style="width:100%" type="text" id='OverlayW' />
+                    </div>
+                    <div style="width: 20%;text-align: center;" class="columnContent">
+                        <label class="configlabel">Startup OV height</label>
+                    </div>
+                    <div style="width: 15%;" class="columnContent">
+                        <input style="width:100%" type="text" id='OverlayH' />
+                    </div>
+                </div>
+
+                <div style="margin: auto; margin-top: 10px;" class="row">
+                    <div style="width: 20%;" class="columnContent" >
+                        <label class="configlabel">Startup OV left</label>
+                    </div>
+                    <div style="width: 15%;" class="columnContent">
+                        <input style="width:100%" type="text" id='OverlayL' />
+                    </div>
+                    <div style="width: 20%;text-align: center;" class="columnContent">
+                        <label class="configlabel">Startup OV top</label>
+                    </div>
+                    <div style="width: 15%;" class="columnContent">
+                        <input style="width:100%" type="text" id='OverlayT' />
+                    </div>
+                </div>
 
                 <div style="margin: auto; margin-top: 10px;" class="row">
                     <div class="columnContent">
-                        <label class="configlabel">Schedule Type</label>
+                        <label class="configlabel">Manual Overlay Video input</label>
                     </div>
-                    <div style="width:40%; margin-top: 1%;" class="columnContent">
-                        <input style="border-color: white;" type="radio" id="rdbserver" name="cake" value="1">
-                        <label style="margin-top: 2%;" for="rdbserver">Server</label>&nbsp;
-                        <input style="border-color: white;" type="radio" id="rdblocal" name="cake" value="0">
-                        <label style="margin-top: 2%;" for="rdblocal">Local</label>
-                        <!-- <input style="width:100%"  class="my_input_style" id='txtiden' /> -->
+                    <div style="width: 50%;" class="columnContent">
+                        <input style="width:100%" type="text" id='txtProgram' />
+                    </div>
+                    <div style="width: 25%; float:left;padding-left: 2%;">
+                        <button onclick='return runprogram()'>RUN</button>
                     </div>
                 </div>
 
-                <div style="margin-top: 20px;" class="content">
-                    <label class="configtitle">
-                        NETWORK</label>
 
-                    <div style="font-size: 16px;" class="Logincontent2">
-                        <div id="loadings" class="lds-ring">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+            </div>
+            <div style="margin: auto; margin-top: 10px;" class="row">
+                <div class="columnContent">
+                    <label class="configlabel">Schedule Type</label>
+                </div>
+                <div style="width:40%; margin-top: 1%;" class="columnContent">
+                    <input style="border-color: white;" type="radio" id="rdbserver" name="cake" value="1">
+                    <label style="margin-top: 2%;" for="rdbserver">Server</label>&nbsp;
+                    <input style="border-color: white;" type="radio" id="rdblocal" name="cake" value="0">
+                    <label style="margin-top: 2%;" for="rdblocal">Local</label>
+                    <!-- <input style="width:100%"  class="my_input_style" id='txtiden' /> -->
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;" class="content">
+                <label class="configtitle">
+                    NETWORK</label>
+
+                <div style="font-size: 16px;" class="Logincontent2">
+                    <div id="loadings" class="lds-ring">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+
+                    <div style="margin: auto;" class="row">
+                        <div class="column">
+                            <label class="custom">Ethernet :</label>
+
                         </div>
+                        <div class="column">
+                            <label class="custom" id='lblcontethmac'></label>
 
-                        <div style="margin: auto;" class="row">
-                            <div class="column">
-                                <label class="custom">Ethernet :</label>
-
-                            </div>
-                            <div class="column">
-                                <label class="custom" id='lblcontethmac'></label>
-
-                            </div>
-                            <div style="text-align: right" class="column">
-                                <label class="custom" id='lblcontethip'></label>
-
-                            </div>
-                            <div class="column">
-                                <label class="custom" id='lblcontethstatus'></label>
-
-                            </div>
                         </div>
+                        <div style="text-align: right" class="column">
+                            <label class="custom" id='lblcontethip'></label>
 
-                        <div style="margin: auto;" class="row">
-                            <div class="column">
-                                <label class="custom">Wifi :</label>
-
-                            </div>
-                            <div class="column">
-                                <label class="custom" id='lblcontwifimac'></label>
-
-                            </div>
-                            <div style="text-align: right" class="column">
-                                <label class="custom" id='lblcontwifiip'></label>
-
-                            </div>
-                            <div class="column">
-                                <label class="custom" id='lblcontwifistatus'></label>
-
-                            </div>
                         </div>
-                        <div id="loadingsMSG" style="text-align: center;position: absolute;margin-left: 17%;
+                        <div class="column">
+                            <label class="custom" id='lblcontethstatus'></label>
+
+                        </div>
+                    </div>
+
+                    <div style="margin: auto;" class="row">
+                        <div class="column">
+                            <label class="custom">Wifi :</label>
+
+                        </div>
+                        <div class="column">
+                            <label class="custom" id='lblcontwifimac'></label>
+
+                        </div>
+                        <div style="text-align: right" class="column">
+                            <label class="custom" id='lblcontwifiip'></label>
+
+                        </div>
+                        <div class="column">
+                            <label class="custom" id='lblcontwifistatus'></label>
+
+                        </div>
+                    </div>
+                    <div id="loadingsMSG" style="text-align: center;position: absolute;margin-left: 17%;
                         margin-top: -3%;">
-                            please wait retrieving network info...
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top:30px;">
-                    <label class="configtitle">
-                        OTHERS</label>
-                    <!-- <button onclick='return FooSet()'>Set URL</button> -->
-                    <!-- confirm_off("(Display Off) Are you sure?") confirm_restart("(Restart) Are you sure?")-->
-                    <div style="margin-top:10px;">
-                        <button style="margin-left: 7%;" onclick='ConfirmPopOFF()'>Display Off</button>
-                        <button style="margin-left: 1%;" onclick='ConfirmPopRES()'>Restart</button>
-                        <button style="margin-left: 1%;" onclick='ConfirmPopSys()'>System</button>
-                        <button style="margin-left: 1%;" onclick='ConfirmPopSS()'>ScreenShot</button>
-                    </div>
-                </div>
-
-                <div hidden style="margin-top:30px;">
-                    <label class="configtitle">
-                        PATCH <span style="font-size: 12px;color: red;float: right;font-weight: 600;">
-                            *File must be in exact name and format : SMV_venue_client.zip</span></label>
-                    <!-- <button onclick='return FooSet()'>Set URL</button> -->
-                    <div style="margin-top:10px; margin-left:7%;">
-                        <form method="POST" enctype="multipart/form-data" action="/upload">
-                            <input
-                                style="border: 1px solid #ccc;display: inline-block;padding: 6px 12px;cursor: pointer; border-radius: 10px;"
-                                type="file" name="filename" size="60" />
-                            <input type="submit" style=" margin-left: 10px;height: 40;color: black;" value="Update">
-                        </form>
-                    </div>
-                </div>
-
-                <div style="margin-top:30px;margin-bottom:30px;">
-                    <label class="configtitle">
-                        LOG FILE & OTHERS DOWNLOAD</label>
-                    <!-- <button onclick='return FooSet()'>Set URL</button>
-                         onclick="location.href='http://localhost/admin/download/success_log'"
-                     onclick="location.href='http://localhost/admin/download/error_log'"
-                    -->
-                    <div style="margin-top:10px;">
-                        <button id='btnsslog' style="margin-left: 7%;">Success.txt</button>
-                        <button id='btneelog' style="margin-left: 1%;">Error.txt</button>
-                        <button id='btnss' style="margin-left: 1%;">ScreenShot.zip</button>
+                        please wait retrieving network info...
                     </div>
                 </div>
             </div>
+
+            <div style="margin-top:30px;">
+                <label class="configtitle">
+                    OTHERS</label>
+                <!-- <button onclick='return FooSet()'>Set URL</button> -->
+                <!-- confirm_off("(Display Off) Are you sure?") confirm_restart("(Restart) Are you sure?")-->
+                <div style="margin-top:10px;">
+                    <button style="margin-left: 7%;" onclick='ConfirmPopOFF()'>Display Off</button>
+                    <button style="margin-left: 1%;" onclick='ConfirmPopRES()'>Restart</button>
+                    <button style="margin-left: 1%;" onclick='ConfirmPopSys()'>System</button>
+                    <button style="margin-left: 1%;" onclick='ConfirmPopSS()'>ScreenShot</button>
+                    <button style="margin-left: 1%;" onclick='ConfirmPopSign()'>Signage</button>
+                </div>
+            </div>
+
+            <div hidden style="margin-top:30px;">
+                <label class="configtitle">
+                    PATCH <span style="font-size: 12px;color: red;float: right;font-weight: 600;">
+                        *File must be in exact name and format : SMV_venue_client.zip</span></label>
+                <!-- <button onclick='return FooSet()'>Set URL</button> -->
+                <div style="margin-top:10px; margin-left:7%;">
+                    <form method="POST" enctype="multipart/form-data" action="/uploadzip">
+                        <input
+                            style="border: 1px solid #ccc;display: inline-block;padding: 6px 12px;cursor: pointer; border-radius: 10px;"
+                            type="file" name="filename" size="60" />
+                        <input type="submit" style=" margin-left: 10px;height: 40;color: black;" value="Update">
+                    </form>
+                </div>
+            </div>
+
+            <div style="margin-top:30px;margin-bottom:30px;">
+                <label class="configtitle">
+                    LOG FILE & OTHERS DOWNLOAD</label>
+                <!-- <button onclick='return FooSet()'>Set URL</button>
+                         onclick="location.href='http://localhost/admin/download/success_log'"
+                     onclick="location.href='http://localhost/admin/download/error_log'"
+                    -->
+                <div style="margin-top:10px;">
+                    <button id='btnsslog' style="margin-left: 7%;">Success.txt</button>
+                    <button id='btneelog' style="margin-left: 1%;">Error.txt</button>
+                    <button id='btnss' style="display: none;margin-left: 1%;">ScreenShot.zip</button>
+                </div>
+            </div>
+            <!-- </div> -->
         </div>
     </div>
 
-
+    <input hidden="true" id="hdnStartup" />
     <input hidden="true" id="hdnDIP" />
     <input hidden="true" id="hdnCIP" />
     <input hidden="true" id="hdnisrestart" value="0" />
@@ -260,13 +327,15 @@
 
             <div style="font-weight: bold;font-family: sans-serif;">Volume
                 (<span id="txtvol"></span>)
-                <input id="InpVol" type="range" min="0" max="100" step="1" style="float: right;width: 130px; " onchange="updateTxtvol(this.value)" ></input>
+                <input id="InpVol" type="range" min="0" max="100" step="1" style="float: right;width: 130px; "
+                    onchange="updateTxtvol(this.value)"></input>
             </div>
-            
-            <div style="font-weight: bold;font-family: sans-serif;margin-top: 15%;">Brightness 
+
+            <div style="font-weight: bold;font-family: sans-serif;margin-top: 15%;">Brightness
                 (<span id="txtbrig"></span>)
-                <input id="InpBrig" type="range" min="0" max="10" step="1" style="float: right;width: 130px; " onchange="updateTxtbrig(this.value)" ></input>
-           </div>
+                <input id="InpBrig" type="range" min="0" max="10" step="1" style="float: right;width: 130px; "
+                    onchange="updateTxtbrig(this.value)"></input>
+            </div>
 
         </div>
         <button style="border: 1px solid grey; float: right;" onclick="confirm_system(this)">OK</button>
@@ -280,18 +349,38 @@
         <div style="width:100%;height: 115px;" class="column">
 
             <div style="font-weight: bold;font-family: sans-serif;">Screenshot
-                <select id="ddlSS" onchange="dllSSonchange()" style="display: inline;width: auto;cursor: pointer; margin-left: 8%;">
+                <select id="ddlSS" onchange="dllSSonchange()"
+                    style="display: inline;width: auto;cursor: pointer; margin-left: 8%;">
                     <option value="1">ON</option>
                     <option value="0">OFF</option>
                 </select>
             </div>
 
             <div id="SSIntDiv" style="display:none;font-weight: bold;font-family: sans-serif;">Interval (Second)
-                <input id="SSIntTxt" type='number' min="30" max="3600" style="font-size: large;border-radius: 10%;margin: 5%;"></input>
+                <input id="SSIntTxt" type='number' min="30" max="3600"
+                    style="font-size: large;border-radius: 10%;margin: 5%;"></input>
             </div>
 
         </div>
         <button style="border: 1px solid grey; float: right;" onclick="confirm_screenshot(this)">OK</button>
+        <button style="border: 1px solid grey;margin-right: 10;float: right;"
+            onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
+    </div>
+</div>
+
+<div id='popSignageControl' style="display:none;height: 125px;width: 300px;right:38%;top:40%;">
+    <div style="margin-top: -2%;" class="row">
+        <div style="width:100%;height: 70px;" class="column">
+
+            <div style="font-weight: bold;font-family: sans-serif;">Signage
+                <select id="ddlSign" style="display: inline;width: auto;cursor: pointer; margin-left: 8%;">
+                    <option value="1">ON</option>
+                    <option value="0">OFF</option>
+                </select>
+            </div>
+
+        </div>
+        <button style="border: 1px solid grey; float: right;" onclick="confirm_signage(this)">OK</button>
         <button style="border: 1px solid grey;margin-right: 10;float: right;"
             onclick="this.parentElement.parentElement.style.display='none';">Cancel</button>
     </div>
