@@ -22,7 +22,7 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 # Clone this repository
 git clone https://github.com/chchch12345/electron_smv
 # Go into the repository
-cd electron-quick-start
+cd electron_smv
 # Install dependencies
 npm install
 # Run the app
